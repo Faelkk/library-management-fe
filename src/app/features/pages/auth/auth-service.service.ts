@@ -10,25 +10,33 @@ export class AuthServiceService {
   constructor(private httpClient: HttpClient) {}
 
   signin(email: string, password: string) {
-    return this.httpClient.post<any>('/user/signin', { email, password });
+    return this.httpClient.post<AuthTokenResponse>('/user/login', {
+      email,
+      password,
+    });
   }
 
-  signup(name: string, email: string, password: string) {
+  signup(name: string, email: string, password: string, phoneNumber: string) {
     return this.httpClient
-      .post<AuthTokenResponse>('/user/signup', { name, email, password })
+      .post<AuthTokenResponse>('/user/create', {
+        name,
+        email,
+        password,
+        phoneNumber,
+      })
       .pipe(
         tap((value) => {
-          localStorage.setItem('auth-token', value.Token);
+          localStorage.setItem('auth-token', value.token);
         })
       );
   }
 
   recoveryPassword(email: string) {
     return this.httpClient
-      .post<AuthTokenResponse>('/user/recover-password', { email })
+      .patch<AuthTokenResponse>('/user/recover-password', { email })
       .pipe(
         tap((value) => {
-          localStorage.setItem('/auth-token', value.Token);
+          localStorage.setItem('/auth-token', value.token);
         })
       );
   }
@@ -40,5 +48,11 @@ export class AuthServiceService {
         password,
       }
     );
+  }
+
+  isTokenValid(token: string) {
+    return this.httpClient.get<{ isValid: boolean }>('/user/validate-token', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
   }
 }

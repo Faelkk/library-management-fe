@@ -32,6 +32,7 @@ interface SigninForm {
 })
 export class SigninComponent {
   signinForm!: FormGroup<SigninForm>;
+  isLoading: boolean = false;
 
   constructor(
     private router: Router,
@@ -48,34 +49,34 @@ export class SigninComponent {
   }
 
   navigate() {
-    this.router.navigate(['signup']);
+    this.router.navigate(['auth/recovery-password']);
   }
 
   submit() {
-    if (this.signinForm.invalid) {
+    if (this.signinForm.invalid || this.isLoading) {
       return;
     }
+
+    this.isLoading = true;
 
     this.authService
       .signin(this.signinForm.value.email, this.signinForm.value.password)
       .subscribe({
         next: (response) => {
+          this.isLoading = false;
+
           if (response.token) {
             localStorage.setItem('auth-token', response.token);
             this.toastService.success('Login feito com sucesso!');
-            this.router.navigate(['user']);
-          } else if (response.message?.includes('dois fatores')) {
-            this.toastService.info(
-              'Código de verificação enviado para seu e-mail.'
-            );
-            this.router.navigate(['verify-two-fa'], {
-              queryParams: { email: response.email },
-            });
+            this.router.navigate(['dashboard/books']);
           } else {
-            this.toastService.error('Resposta inesperada do servidor.');
+            this.toastService.error(
+              'Dados incorretos, verifique a senha ou o email e tente novamente.'
+            );
           }
         },
         error: () => {
+          this.isLoading = false;
           this.toastService.error(
             'Erro inesperado! Tente novamente mais tarde.'
           );

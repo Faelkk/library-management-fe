@@ -1,23 +1,19 @@
 <button
   [disabled]="disabled || isLoading"
+  [type]="type"
+  (click)="handleClick($event)"
   [ngClass]="[
-    'bg-teal-900 hover:bg-teal-800 disabled:bg-gray-500 flex items-center justify-center disabled:text-gray-400 disabled:cursor-not-allowed px-6 h-12 rounded-2xl font-medium  capitalize text-white transition-all font-poppins mt-4 w-full md:min-w-[27.5rem]',
+    'bg-teal-900 hover:bg-teal-800 disabled:bg-gray-500 flex items-center justify-center disabled:text-gray-400 disabled:cursor-not-allowed px-6 h-12 rounded-2xl font-medium capitalize text-white transition-all font-poppins mt-4 w-full md:min-w-[27.5rem]',
     variant === 'danger' ? 'bg-red-900 hover:bg-red-800' : '',
     variant === 'ghost' ? 'bg-transparent border border-gray-800 text-gray-800 hover:bg-gray-800/5' : '',
     className
   ]"
 >
-
-@if (!isLoading) {
-    <ng-container >
+  @if (!isLoading) {
     <ng-content></ng-content>
-  </ng-container>
-}
+  }
 
-
-@if(isLoading) {
-    <ng-container >
+  @if (isLoading) {
     <app-spinner class="w-6 h-6"></app-spinner>
-  </ng-container>
-}
+  }
 </button>

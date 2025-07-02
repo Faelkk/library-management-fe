@@ -1,53 +1,61 @@
 <main class="flex h-screen justify-center items-center">
-
   <section class="px-4">
     <app-auth-header
-           [title]="'Crie sua conta'"
+      [title]="'Crie sua conta'"
       [subtitle]="'Já possui uma conta?'"
       [linkText]="'Fazer login'"
+      [link]="'auth/signin'"
     ></app-auth-header>
-  <form [formGroup]="signupForm" class="mt-5 flex flex-col gap-2">
-
-    <app-input
-      formControlName="name"
-      inputName="name"
-      type="text"
-      label="Seu nome"
-      placeholder="Digite seu nome"
-    >
-    </app-input>
-
-    <app-input
-      formControlName="email"
-      inputName="email"
-      type="email"
-      label="Email"
-      placeholder="johndoe@gmail.com"
-    >
-    </app-input>
-
-   <app-input
-  formControlName="phoneNumber"
-  inputName="phoneNumber"
-  type="text"
-  label="Seu numero de telefone"
-  placeholder="Ex: (51) 99999-9999"
-  [maxlength]="15"
-  (valueChange)="signupForm.get('phoneNumber')?.setValue($event)"
-></app-input>
-
+    <form [formGroup]="signupForm" class="mt-5 flex flex-col gap-2">
+      <app-input
+        formControlName="name"
+        inputName="name"
+        type="text"
+        label="Seu nome"
+        placeholder="Digite seu nome"
+      >
+      </app-input>
 
       <app-input
-      formControlName="password"
-      inputName="password"
-      type="password"
-      label="Sua senha"
-    ></app-input>
+        formControlName="email"
+        inputName="email"
+        type="email"
+        label="Email"
+        placeholder="johndoe@gmail.com"
+      >
+      </app-input>
 
-    <a href="recovery-password" class="text-teal-900  font-poppins font-medium mt-5"><span>Esqueceu sua senha?</span></a>
+      <app-input
+        formControlName="phoneNumber"
+        inputName="phoneNumber"
+        type="text"
+        label="Seu numero de telefone"
+        placeholder="Ex: (51) 99999-9999"
+        [maxlength]="15"
+        (valueChange)="signupForm.get('phoneNumber')?.setValue($event)"
+      ></app-input>
 
-    <app-button [disabled]="!signupForm.valid">Criar conta</app-button>
-  </form>
+      <app-input
+        formControlName="password"
+        inputName="password"
+        type="password"
+        label="Sua senha"
+      ></app-input>
 
+      <a
+        (click)="navigate()"
+        class="text-teal-900 font-poppins font-medium mt-5 cursor-pointer"
+      >
+        Esqueceu sua senha?
+      </a>
+
+      <app-button
+        [disabled]="!signupForm.valid || isLoading"
+        [type]="'submit'"
+        [isLoading]="isLoading"
+        (onClick)="submit()"
+        >Criar conta</app-button
+      >
+    </form>
   </section>
 </main>

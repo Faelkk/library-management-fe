@@ -4,11 +4,12 @@ import { GenresComponent } from './genres/genres.component';
 import { ClientsComponent } from './clients/clients.component';
 import { UsersComponent } from './users/users.component';
 import { LoansComponent } from './loans/loans.component';
+import { AuthGuard } from '../../../core/guards/auth.guard';
 
 export const dashboardRoutes: Routes = [
-  { path: 'books', component: BooksComponent },
-  { path: 'genres', component: GenresComponent },
-  { path: 'clients', component: ClientsComponent },
-  { path: 'users', component: UsersComponent },
-  { path: 'loans', component: LoansComponent },
+  { path: 'books', component: BooksComponent, canActivate: [AuthGuard] },
+  { path: 'genres', component: GenresComponent, canActivate: [AuthGuard] },
+  { path: 'clients', component: ClientsComponent, canActivate: [AuthGuard] },
+  { path: 'users', component: UsersComponent, canActivate: [AuthGuard] },
+  { path: 'loans', component: LoansComponent, canActivate: [AuthGuard] },
 ];

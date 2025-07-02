@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-auth-header',
@@ -10,4 +11,13 @@ export class AuthHeaderComponent {
   @Input() title = '';
   @Input() subtitle = '';
   @Input() linkText = '';
+  @Input() link = '';
+
+  constructor(private router: Router) {}
+
+  navigate() {
+    if (this.link) {
+      this.router.navigate([this.link]);
+    }
+  }
 }

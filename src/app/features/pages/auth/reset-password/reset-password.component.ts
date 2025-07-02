@@ -30,6 +30,7 @@ interface ResetPasswordForm {
 })
 export class ResetPasswordComponent {
   resetPasswordForm!: FormGroup<ResetPasswordForm>;
+  isLoading: boolean = false;
 
   constructor(
     private router: Router,
@@ -50,10 +51,14 @@ export class ResetPasswordComponent {
   }
 
   navigate() {
-    this.router.navigate(['signup']);
+    this.router.navigate(['auth/signin']);
   }
 
   submit() {
+    if (this.resetPasswordForm.invalid || this.isLoading) {
+      return;
+    }
+
     if (
       this.resetPasswordForm.value.password !==
       this.resetPasswordForm.value.confirmPassword
@@ -69,17 +74,18 @@ export class ResetPasswordComponent {
       return;
     }
 
+    this.isLoading = true;
+
     this.authService
       .resetPasswordForm(this.resetPasswordForm.value.password, token)
       .subscribe({
-        next: (response) => {
-          if (response.Token) {
-            localStorage.setItem('auth-token', response.Token);
-            this.toastService.success('Login feito com sucesso!');
-            this.router.navigate(['dashboard']);
-          }
+        next: () => {
+          this.isLoading = false;
+          this.toastService.success('Senha redefinida com sucesso!');
+          this.router.navigate(['auth/signin']);
         },
         error: () => {
+          this.isLoading = false;
           this.toastService.error(
             'Erro inesperado! Tente novamente mais tarde.'
           );

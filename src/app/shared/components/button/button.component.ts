@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SpinnerComponent } from '../spinner/spinner.component';
 import { CommonModule } from '@angular/common';
 
@@ -13,4 +13,12 @@ export class ButtonComponent {
   @Input() isLoading: boolean = false;
   @Input() variant: string = '';
   @Input() className: string = '';
+  @Input() type: string = 'button';
+
+  @Output() onClick = new EventEmitter<Event>();
+
+  handleClick(event: Event): void {
+    event.preventDefault();
+    this.onClick.emit(event);
+  }
 }

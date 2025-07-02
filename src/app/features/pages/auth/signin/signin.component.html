@@ -1,32 +1,47 @@
 <main class="flex h-screen justify-center items-center">
-
   <section class="px-4">
     <app-auth-header
-       [title]="'Entre em sua conta'"
-      [subtitle]="'Não tem uma conta?'"
-      [linkText]="'Criar uma conta'"
-    ></app-auth-header>
-  <form [formGroup]="signinForm" class="mt-5 flex flex-col gap-2">
-    <app-input
-      formControlName="email"
-      inputName="email"
-      type="email"
-      label="Email"
-      placeholder="johndoe@gmail.com"
+  [title]="'Fazer login'"
+  [subtitle]="'Ainda não possui conta?'"
+  [linkText]="'Criar uma conta'"
+  [link]="'auth/signup'"
+></app-auth-header>
+
+    <form
+      [formGroup]="signinForm"
+      (ngSubmit)="submit()"
+      class="mt-5 flex flex-col gap-2"
     >
-    </app-input>
+      <app-input
+        formControlName="email"
+        inputName="email"
+        type="email"
+        label="Email"
+        placeholder="johndoe@gmail.com"
+      ></app-input>
 
       <app-input
-      formControlName="password"
-      inputName="password"
-      type="password"
-      label="Sua senha"
-    ></app-input>
+        formControlName="password"
+        inputName="password"
+        type="password"
+        label="Sua senha"
+      ></app-input>
 
-    <a href="recovery-password" class="text-teal-900 font-poppins font-medium mt-5"><span>Esqueceu sua senha?</span></a>
+      <a
+         (click)="navigate()"
+        class="text-teal-900 font-poppins font-medium mt-5 cursor-pointer"
+      >
+       Esqueceu sua senha?
+      </a>
 
-       <app-button [disabled]="!signinForm.valid">Entrar</app-button>
-  </form>
-
+      <app-button
+        [disabled]="!signinForm.valid || isLoading"
+        [type]="'submit'"
+        [isLoading]="isLoading"
+        (onClick)="submit()"
+      >
+        Entrar
+      </app-button>
+    </form>
   </section>
 </main>

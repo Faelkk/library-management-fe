@@ -29,6 +29,7 @@ interface RecoveryPasswordForm {
 })
 export class RecoveryPasswordComponent {
   recoveryPasswordForm!: FormGroup<RecoveryPasswordForm>;
+  isLoading: boolean = false;
 
   constructor(
     private router: Router,
@@ -41,25 +42,27 @@ export class RecoveryPasswordComponent {
   }
 
   navigate() {
-    this.router.navigate(['signup']);
+    this.router.navigate(['auth/signin']);
   }
 
   submit() {
-    if (this.recoveryPasswordForm.invalid) {
+    if (this.recoveryPasswordForm.invalid || this.isLoading) {
       return;
     }
+
+    this.isLoading = true;
 
     this.authService
       .recoveryPassword(this.recoveryPasswordForm.value.email)
       .subscribe({
-        next: (response) => {
-          if (response.Token) {
-            localStorage.setItem('auth-token', response.Token);
-            this.toastService.success('Login feito com sucesso!');
-            this.router.navigate(['dashboard']);
-          }
+        next: () => {
+          this.toastService.success(
+            'Se uma aconta com esse email existir, o email foi enviado'
+          );
+          this.router.navigate(['auth/signin']);
         },
         error: () => {
+          this.isLoading = false;
           this.toastService.error(
             'Erro inesperado! Tente novamente mais tarde.'
           );

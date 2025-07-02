@@ -32,6 +32,7 @@ interface SignupForm {
 })
 export class SignupComponent {
   signupForm!: FormGroup<SignupForm>;
+  isLoading: boolean = false;
 
   constructor(
     private router: Router,
@@ -50,29 +51,34 @@ export class SignupComponent {
   }
 
   navigate() {
-    this.router.navigate(['signup']);
+    this.router.navigate(['auth/recovery-password']);
   }
 
   submit() {
-    if (this.signupForm.invalid) {
+    if (this.signupForm.invalid || this.isLoading) {
       return;
     }
+
+    this.isLoading = true;
 
     this.authService
       .signup(
         this.signupForm.value.name,
         this.signupForm.value.email,
-        this.signupForm.value.password
+        this.signupForm.value.password,
+        this.signupForm.value.phoneNumber
       )
       .subscribe({
         next: (response) => {
-          if (response.Token) {
-            localStorage.setItem('auth-token', response.Token);
+          if (response.token) {
+            this.isLoading = false;
+            localStorage.setItem('auth-token', response.token);
             this.toastService.success('Login feito com sucesso!');
             this.router.navigate(['dashboard']);
           }
         },
         error: () => {
+          this.isLoading = false;
           this.toastService.error(
             'Erro inesperado! Tente novamente mais tarde.'
           );
