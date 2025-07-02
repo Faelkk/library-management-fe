@@ -1,4 +1,4 @@
 button:hover:enabled {
   background-color: var(--color-teal-700);
   cursor: pointer;
-};
+}

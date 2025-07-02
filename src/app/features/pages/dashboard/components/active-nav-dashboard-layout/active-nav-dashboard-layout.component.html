@@ -1,0 +1,14 @@
+<li class="transition-colors">
+  <a
+    [routerLink]="link"
+    routerLinkActive="border border-teal-900 text-teal-900 drop-shadow-sm"
+    class="p-2 rounded-sm flex items-center gap-2 text-lg cursor-pointer transition-colors"
+    [routerLinkActiveOptions]="{ exact: true }"
+  >
+    <ng-container
+      *ngComponentOutlet="iconComponent; injector: createIconInjector()"
+    ></ng-container>
+
+    {{ label }}
+  </a>
+</li>

@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
+import { DashboardLayoutComponent } from '../components/dashboard-layout/dashboard-layout.component';
 
 @Component({
   selector: 'app-books',
-  imports: [],
+  imports: [DashboardLayoutComponent],
   templateUrl: './books.component.html',
-  styleUrl: './books.component.css'
+  styleUrl: './books.component.css',
 })
-export class BooksComponent {
-
-}
+export class BooksComponent {}

@@ -14,29 +14,30 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   canActivate(): Observable<boolean> {
-    const token = localStorage.getItem('auth-token');
-    if (!token) {
-      this.router.navigate(['auth/signin']);
-      return of(false);
-    }
+    return of(true);
 
-    return this.authService.isTokenValid(token).pipe(
-      map((res) => {
-        if (res.isValid) {
-          return true;
-        } else {
-          localStorage.removeItem('auth-token');
-          this.router.navigate(['auth/signin']);
-          return false;
-        }
-      }),
-      catchError((err) => {
-        if (err.status === 401) {
-          localStorage.removeItem('auth-token');
-        }
-        this.router.navigate(['auth/signin']);
-        return of(false);
-      })
-    );
+    // const token = localStorage.getItem('auth-token');
+    // if (!token) {
+    //   this.router.navigate(['auth/signin']);
+    //   return of(false);
+    // }
+    // return this.authService.isTokenValid(token).pipe(
+    //   map((res) => {
+    //     if (res.isValid) {
+    //       return true;
+    //     } else {
+    //       localStorage.removeItem('auth-token');
+    //       this.router.navigate(['auth/signin']);
+    //       return false;
+    //     }
+    //   }),
+    //   catchError((err) => {
+    //     if (err.status === 401) {
+    //       localStorage.removeItem('auth-token');
+    //     }
+    //     this.router.navigate(['auth/signin']);
+    //     return of(false);
+    //   })
+    // );
   }
 }

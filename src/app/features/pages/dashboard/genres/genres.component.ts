@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
+import { DashboardLayoutComponent } from '../components/dashboard-layout/dashboard-layout.component';
 
 @Component({
   selector: 'app-genres',
-  imports: [],
+  imports: [DashboardLayoutComponent],
   templateUrl: './genres.component.html',
-  styleUrl: './genres.component.css'
+  styleUrl: './genres.component.css',
 })
-export class GenresComponent {
-
-}
+export class GenresComponent {}

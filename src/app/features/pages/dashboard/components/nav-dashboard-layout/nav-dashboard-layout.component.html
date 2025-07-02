@@ -1,0 +1,40 @@
+<aside
+  class="h-full bg-white rounded-tr-2xl rounded-br-2xl drop-shadow-sm md:min-w-[10rem] lg:min-w-[17.5rem] hidden md:flex md:flex-col"
+>
+ <aside class="h-full bg-white rounded-tr-2xl rounded-br-2xl drop-shadow-sm md:min-w-[10rem] lg:min-w-[17.5rem] hidden md:flex md:flex-col">
+  <app-dashboard-sidebar
+    [personIcon]="personIcon"
+    [bookIcon]="bookIcon"
+    [categoryIcon]="categoryIcon"
+    [bagIcon]="bagIcon"
+  ></app-dashboard-sidebar>
+</aside>
+
+</aside>
+
+<section class="p-3 flex flex-col h-full">
+  <div class="flex w-full items-center justify-between">
+    <header class="p-3">
+      <h1 class="font-poppins text-gray-800">Library management</h1>
+    </header>
+    <button class="bg-gray-50 rounded-full p-1" (click)="toggleModal()">
+      <img src="/assets/icons/menu.svg" />
+    </button>
+  </div>
+</section>
+
+@if (showModal) {
+<div class="fixed inset-0 bg-gray-900/10 flex justify-start z-50 md:hidden">
+  <aside class="rounded-tr-2xl rounded-br-2xl drop-shadow-sm w-full flex flex-col">
+    <app-dashboard-sidebar
+      [showCloseButton]="true"
+      (close)="toggleModal()"
+      [personIcon]="personIcon"
+      [bookIcon]="bookIcon"
+      [categoryIcon]="categoryIcon"
+      [bagIcon]="bagIcon"
+    ></app-dashboard-sidebar>
+  </aside>
+</div>
+}
+
