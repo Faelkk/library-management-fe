@@ -1,0 +1,32 @@
+<main class="flex h-screen justify-center items-center">
+
+  <section class="px-4">
+    <app-auth-header
+       [title]="'Entre em sua conta'"
+      [subtitle]="'Não tem uma conta?'"
+      [linkText]="'Criar uma conta'"
+    ></app-auth-header>
+  <form [formGroup]="signinForm" class="mt-5 flex flex-col gap-2">
+    <app-input
+      formControlName="email"
+      inputName="email"
+      type="email"
+      label="Email"
+      placeholder="johndoe@gmail.com"
+    >
+    </app-input>
+
+      <app-input
+      formControlName="password"
+      inputName="password"
+      type="password"
+      label="Sua senha"
+    ></app-input>
+
+    <a href="recovery-password" class="text-teal-900 font-poppins font-medium mt-5"><span>Esqueceu sua senha?</span></a>
+
+       <app-button [disabled]="!signinForm.valid">Entrar</app-button>
+  </form>
+
+  </section>
+</main>
