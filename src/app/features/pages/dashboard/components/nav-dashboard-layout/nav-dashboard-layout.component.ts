@@ -5,6 +5,8 @@ import { CategoryComponent } from '../../../../../shared/components/icons/catego
 import { BagComponent } from '../../../../../shared/components/icons/bag/bag.component';
 import { PersonComponent } from '../../../../../shared/components/icons/person/person.component';
 import { DashboardSidebarComponent } from '../dashboard-sidebar/dashboard-sidebar.component';
+import { ClientsComponent } from '../../clients/clients.component';
+import { ClientComponent } from '../../../../../shared/components/icons/client/client.component';
 
 @Component({
   selector: 'app-nav-dashboard-layout',
@@ -17,6 +19,7 @@ export class NavDashboardLayoutComponent {
   bookIcon = BookComponent;
   categoryIcon = CategoryComponent;
   bagIcon = BagComponent;
+  clientIcon = ClientComponent;
 
   showModal = false;
 

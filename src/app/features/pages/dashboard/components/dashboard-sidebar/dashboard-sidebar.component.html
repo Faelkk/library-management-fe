@@ -1,11 +1,13 @@
-<section class="p-3 flex flex-col bg-white h-full w-full">
+<section
+  class="p-3 flex flex-col bg-white min-h-screen lg:max-h-screen h-full w-full rounded-bl-md rounded-br-md md:rounded-none transitions"
+>
   <header class="p-3 flex justify-between items-center">
     <h1 class="font-poppins text-gray-800">Library management</h1>
 
     @if (showCloseButton) {
-      <button (click)="close.emit()" class="p-1">
-        <img src="/assets/icons/close.svg" />
-      </button>
+    <button (click)="close.emit()" class="p-1">
+      <img src="/assets/icons/close.svg" />
+    </button>
     }
   </header>
 
@@ -31,14 +33,22 @@
 
       <app-active-nav-dashboard-layout
         link="/dashboard/genres"
-        label="Categorias"
+        label="Gêneros"
         [iconComponent]="bagIcon"
+      ></app-active-nav-dashboard-layout>
+
+      <app-active-nav-dashboard-layout
+        link="/dashboard/clients"
+        label="Clientes"
+        [iconComponent]="clientIcon"
       ></app-active-nav-dashboard-layout>
     </ul>
   </nav>
 
   <section class="mt-10">
-    <button class="flex items-center p-2 rounded-sm gap-2 text-red-800 font-medium cursor-pointer">
+    <button
+      class="flex items-center p-2 rounded-sm gap-2 text-red-800 font-medium cursor-pointer"
+    >
       <img src="/assets/icons/leave.svg" />
       <span>Sair</span>
     </button>

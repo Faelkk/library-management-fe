@@ -3,7 +3,6 @@ import { NavDashboardLayoutComponent } from '../nav-dashboard-layout/nav-dashboa
 
 @Component({
   selector: 'app-dashboard-layout',
-  standalone: true,
   templateUrl: './dashboard-layout.component.html',
   styleUrl: './dashboard-layout.component.css',
   imports: [NavDashboardLayoutComponent],

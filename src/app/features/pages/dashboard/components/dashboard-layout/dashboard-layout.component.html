@@ -1,6 +1,10 @@
-<main class="flex flex-col md:flex-row h-screen bg-gray-50 w-full">
-  <app-nav-dashboard-layout></app-nav-dashboard-layout>
-  <section class="p-3">
+<main
+  class="flex flex-col md:flex-row min-h-screen lg:max-h-screen h-full bg-gray-50 w-full"
+>
+  <app-nav-dashboard-layout
+    class="md:min-h-screen lg:max-h-screen h-full"
+  ></app-nav-dashboard-layout>
+  <section class="p-3 flex-1">
     <ng-content></ng-content>
   </section>
 </main>

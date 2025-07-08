@@ -1,3 +1,158 @@
 <app-dashboard-layout>
-  <h2>Genres</h2>
+  <section class="p-3 w-full h-full lg:max-h-screen">
+    <header class="flex gap-4 flex-col md:flex-row justify-between w-full">
+      <section class="flex flex-col gap-2">
+        <h1 class="font-poppins text-2xl text-gray-900 font-bold">Gêneros</h1>
+        <span class="font-sans text-gray-700">Controle todos os gêneros</span>
+      </section>
+
+      <section
+        class="flex flex-col bg-white drop-shadow-sm py-3 px-5 rounded-md gap-2"
+      >
+        <span class="font-poppins text-gray-700 text-sm"
+          >Número total de gêneros:</span
+        >
+        <span class="font-sans text-gray-900 font-bold">{{
+          genres().length
+        }}</span>
+      </section>
+    </header>
+
+    <section class="flex flex-col w-full flex-1">
+      <header
+        class="flex flex-col gap-2 md:flex-row justify-between w-full md:items-center mt-10"
+      >
+        <h2 class="font-poppins text-gray-800 font-medium">Lista de gêneros</h2>
+
+        <app-input
+          placeholder="Pesquise um gênero"
+          class="w-full md:max-w-[18.75rem] lg:max-w-[27.5rem]"
+          (valueChange)="updateSearch($event)"
+        >
+          <img src="assets/icons/search.svg" alt="Search" class="w-5 h-5" />
+        </app-input>
+      </header>
+      <div class="mt-10 flex flex-wrap gap-5 max-h-[32rem] overflow-auto">
+        @if (isLoadingGenres()) {
+        <div class="w-full flex justify-center items-center py-10">
+          <app-spinner />
+        </div>
+        } @else if (filteredGenres().length === 0 ) {
+        <p class="text-gray-500 text-center w-full">
+          Nenhum gênero encontrado.
+        </p>
+        } @else { @for (genres of filteredGenres(); track genres.id) {
+        <app-genres-card
+          [description]="genres.description"
+          [name]="genres.name"
+          [id]="genres.id"
+          class="w-full lg:w-auto"
+          (edit)="openEditModal(genres)"
+          (delete)="openDeleteModal(genres)"
+        ></app-genres-card>
+        } }
+      </div>
+
+      <div class="w-full flex justify-end mt-5">
+        <app-button (click)="openModal()" className="bg-teal-900">
+          <img src="assets/icons/add.svg" />
+        </app-button>
+      </div>
+    </section>
+  </section>
 </app-dashboard-layout>
+
+<app-modal
+  [show]="showAddModal()"
+  (close)="closeModal()"
+  title="Adicionar um gênero"
+>
+  <form
+    [formGroup]="createGenreForm"
+    (submit)="saveGenre()"
+    class="md:min-w-[30rem]"
+  >
+    <div class="flex flex-col gap-3">
+      <app-input
+        label="Nome do Gênero"
+        placeholder="Ex: Romance"
+        formControlName="name"
+      ></app-input>
+      <app-input
+        label="Descrição do Gênero"
+        placeholder="Ex: Grandes jornadas, explorações e desafios épicos."
+        formControlName="description"
+      ></app-input>
+    </div>
+    <div class="flex justify-end gap-2 mt-4 w-full">
+      <app-button
+        class="w-full"
+        [className]="
+          !createGenreForm.invalid ? 'bg-teal-900 text-white rounded-2xl' : ''
+        "
+        [disabled]="createGenreForm.invalid || isCreating"
+        [isLoading]="isCreating"
+      >
+        Criar
+      </app-button>
+    </div>
+  </form>
+</app-modal>
+
+<app-modal
+  [show]="showEditModal()"
+  (close)="closeModal()"
+  title="Editar gênero"
+>
+  <form
+    [formGroup]="editGenreForm"
+    (submit)="updateGenre()"
+    class="md:min-w-[30rem]"
+  >
+    <div class="flex flex-col gap-3">
+      <app-input
+        label="Nome do Gênero"
+        placeholder="Ex: Romance"
+        formControlName="name"
+      ></app-input>
+
+      <app-input
+        label="Descrição do Gênero"
+        placeholder="Ex: Histórias envolventes repletas de exploração, desafios e descobertas, onde os personagens embarcam em jornadas emocionantes em busca de novos mundos, tesouros ou grandes feitos."
+        formControlName="name"
+      ></app-input>
+    </div>
+    <div class="flex justify-end gap-2 mt-4 w-full">
+      <app-button
+        class="bg-teal-900 text-white rounded-2xl w-full"
+        [disabled]="editGenreForm.invalid || isEditing"
+        type="submit"
+      >
+        Atualizar
+      </app-button>
+    </div>
+  </form>
+</app-modal>
+
+<app-modal
+  [show]="showDeleteModal()"
+  (close)="closeModal()"
+  title="Excluir gênero"
+>
+  <p class="mb-4 mt-10 max-w-80">
+    Tem certeza que deseja excluir o gênero
+    <strong>{{ selectedGenre?.name }}</strong
+    >?
+  </p>
+
+  <div class="flex justify-end gap-2 mt-10 w-full">
+    <app-button
+      class="border-red-700 text-red-700 border rounded-2xl w-full"
+      (onClick)="confirmDelete()"
+      [disabled]="isDeleting"
+      [isLoading]="isDeleting"
+    >
+      Confirmar
+    </app-button>
+  </div>
+</app-modal>

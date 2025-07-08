@@ -1,0 +1,28 @@
+<div class="input-wrapper text-base w-full">
+  <label [for]="inputName" class="font-sans text-gray-800">{{ label }}</label>
+
+  <div
+    class="input-content flex items-center border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full drop-shadow-sm"
+  >
+    <input
+      [id]="inputName"
+      [type]="type"
+      [placeholder]="placeholder"
+      [value]="value"
+      [attr.maxlength]="maxlength"
+      (input)="onInput($event)"
+      (click)="$event.stopPropagation()"
+      class="flex-1 peer focus:outline-none font-sans placeholder:text-gray-500 text-gray-800"
+    />
+
+    @if (hasContent) {
+    <button
+      type="button"
+      class="p-2 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+      (click)="$event.stopPropagation()"
+    >
+      <ng-content></ng-content>
+    </button>
+    }
+  </div>
+</div>

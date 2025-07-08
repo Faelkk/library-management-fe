@@ -4,7 +4,6 @@ import { NgComponentOutlet } from '@angular/common';
 
 @Component({
   selector: 'app-active-nav-dashboard-layout',
-  standalone: true,
   imports: [RouterModule, NgComponentOutlet],
   templateUrl: './active-nav-dashboard-layout.component.html',
   styleUrl: './active-nav-dashboard-layout.component.css',

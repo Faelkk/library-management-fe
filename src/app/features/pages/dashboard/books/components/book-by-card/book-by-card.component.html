@@ -1,0 +1,53 @@
+<section
+  class="bg-white rounded-sm p-3 md:min-w-full lg:min-w-[20rem] w-full drop-shadow-md flex flex-col gap-3"
+>
+  <img
+    [src]="bookImageUrl"
+    alt="Capa do livro"
+    class="w-full h-64 object-cover rounded-sm"
+  />
+
+  <div class="flex flex-col gap-1 max-w-[90%] flex-1">
+    <h1 class="font-poppins text-gray-900 font-medium text-lg">{{ title }}</h1>
+
+    <span class="text-gray-700 font-sans text-sm flex items-center">
+      <strong>Autor:</strong> {{ author }}
+    </span>
+
+    <span class="text-gray-700 font-sans text-sm flex items-center">
+      <strong>Ano:</strong> {{ publishYear }}
+    </span>
+
+    <span class="text-gray-700 font-sans text-sm flex items-center">
+      <strong>ID:</strong>
+      <span
+        class="inline-block max-w-[4rem] overflow-hidden text-ellipsis whitespace-nowrap align-middle"
+      >
+        {{ id }}
+      </span>
+    </span>
+  </div>
+
+  <div class="flex gap-4 items-center mt-3">
+    <button
+      class="p-1 rounded-sm text-red-900 border-red-900 border cursor-pointer"
+      (click)="delete.emit()"
+    >
+      <img src="assets/icons/delete.svg" />
+    </button>
+
+    <button
+      class="p-1 rounded-sm border-gray-900 border cursor-pointer"
+      (click)="edit.emit()"
+    >
+      <img src="assets/icons/edit.svg" />
+    </button>
+
+    <button
+      class="p-1 rounded-sm border-teal-900 border cursor-pointer"
+      (click)="seeMore.emit()"
+    >
+      <img src="assets/icons/read.svg" />
+    </button>
+  </div>
+</section>

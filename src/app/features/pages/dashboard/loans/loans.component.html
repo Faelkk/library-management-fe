@@ -1,3 +1,334 @@
 <app-dashboard-layout>
-  <h2>Genres</h2>
+  <section class="p-3 w-full h-full lg:max-h-screen">
+    <header class="flex gap-4 flex-col md:flex-row justify-between w-full">
+      <section class="flex flex-col gap-2">
+        <h1 class="font-poppins text-2xl text-gray-900 font-bold">
+          Livros emprestados
+        </h1>
+        <span class="font-sans text-gray-700">
+          Controle de todos os empréstimos
+        </span>
+      </section>
+
+      <section
+        class="flex flex-col bg-white drop-shadow-sm py-3 px-5 rounded-md gap-2"
+      >
+        <span class="font-poppins text-gray-700 text-sm">
+          Número total de empréstimos:
+        </span>
+        <span class="font-sans text-gray-900 font-bold">{{
+          loans().length
+        }}</span>
+      </section>
+    </header>
+
+    <section class="flex flex-col w-full flex-1">
+      <header
+        class="flex flex-col gap-2 xl:flex-row justify-between w-full xl:items-center mt-10"
+      >
+        <h2 class="font-poppins text-gray-800 font-medium">
+          Lista de todos os empréstimos
+        </h2>
+
+        <div
+          class="flex flex-col md:flex-row gap-4 justify-between items-center xl:max-w-[40rem] w-full"
+        >
+          <div class="flex flex-col relative w-full md:w-auto">
+            <button
+              (click)="toggleDropdownMonth()"
+              class="flex items-center gap-3 input-content border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full smd:w-auto justify-between transition"
+            >
+              {{ displayMonth() }}
+              <img
+                src="assets/icons/arrow-down.svg"
+                class="transition-transform"
+                [class.rotate-180]="showDropdownMonthOpen()"
+              />
+            </button>
+
+            <app-dropdown
+              [showDropdown]="showDropdownMonthOpen()"
+              [options]="months"
+              [selectedValue]="selectedMonth()"
+              (select)="onSelectMonth($event)"
+              (close)="showDropdownMonthOpen.set(false)"
+            ></app-dropdown>
+          </div>
+          <div class="flex flex-col relative w-full md:w-auto">
+            <button
+              (click)="toggleDropdownYear()"
+              class="flex items-center gap-3 input-content border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full smd:w-auto justify-between transition"
+            >
+              {{ displayYear() }}
+              <img
+                src="assets/icons/arrow-down.svg"
+                class="transition-transform"
+                [class.rotate-180]="showDropdownYearOpen()"
+              />
+            </button>
+
+            <app-dropdown
+              [showDropdown]="showDropdownYearOpen()"
+              [options]="yearOptions()"
+              [selectedValue]="selectedYear()"
+              (select)="onSelectYear($event)"
+              (close)="showDropdownYearOpen.set(false)"
+            ></app-dropdown>
+          </div>
+          <app-input
+            placeholder="Procure por cliente ou livro"
+            class="flex-1 w-full"
+            (valueChange)="updateSearch($event)"
+          >
+            <img src="assets/icons/search.svg" alt="Buscar" class="w-5 h-5" />
+          </app-input>
+        </div>
+      </header>
+
+      <div class="mt-10 flex flex-wrap gap-5 max-h-[32rem] overflow-auto">
+        @if (isLoadingLoans()) {
+        <div class="w-full flex justify-center items-center py-10">
+          <app-spinner />
+        </div>
+        } @else if (filteredLoans().length > 0) { @for (loan of filteredLoans();
+        track loan.id) {
+        <app-loan-card
+          [id]="loan.id"
+          [name]="getBookName(loan.bookId)"
+          [description]="'Emprestado para ' + getUserName(loan.clientId)"
+          [loanDate]="loan.loanDate"
+          [expectedDate]="loan.returnDate"
+          [returnedAt]="loan.returnedAt"
+          class="w-full lg:w-auto"
+          (edit)="openEditModal(loan)"
+          (delete)="openDeleteModal(loan)"
+        >
+        </app-loan-card>
+        } } @else {
+        <p class="text-gray-600 font-sans">Nenhum empréstimo encontrado.</p>
+        }
+      </div>
+
+      <div class="w-full flex justify-end mt-5">
+        <app-button (click)="openAddModal()" className="bg-teal-900 block">
+          <img src="assets/icons/add.svg" />
+        </app-button>
+      </div>
+    </section>
+  </section>
 </app-dashboard-layout>
+
+<app-modal
+  [show]="showAddModal()"
+  (close)="closeModal()"
+  title="Criar empréstimo"
+>
+  <form
+    [formGroup]="createLoanForm"
+    (submit)="saveLoan()"
+    class="md:min-w-[35rem]"
+  >
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-sans text-gray-800" for="bookId"
+          >Livro</label
+        >
+        <div
+          class="input-content flex items-center border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full lg:min-w-[27.5rem]"
+        >
+          @if(isLoadingBooks()) {
+          <app-spinner />
+          } @else {
+          <select
+            id="bookId"
+            formControlName="bookId"
+            class="w-full outline-none"
+          >
+            <option [value]="null">Selecione um livro</option>
+            @for (book of books(); track book.id) {
+            <option [value]="book.id">{{ book.title }}</option>
+            }
+          </select>
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-sans text-gray-800" for="clientId"
+          >Cliente</label
+        >
+        <div
+          class="input-content flex items-center border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full lg:min-w-[27.5rem]"
+        >
+          @if(isLoadingClients()) {
+          <app-spinner />
+          } @else {
+          <select
+            id="clientId"
+            formControlName="clientId"
+            class="w-full outline-none"
+          >
+            <option [value]="null">Selecione um usuário</option>
+            @for (client of clients(); track client.id) {
+            <option [value]="client.id">{{ client.name }}</option>
+            }</select
+          >}
+        </div>
+      </div>
+
+      <app-input
+        label="Data do Empréstimo"
+        placeholder="dd/mm/aaaa"
+        type="text"
+        formControlName="loanDate"
+        [maxlength]="10"
+        (valueChange)="onCreateLoanDateInput($event)"
+      ></app-input>
+
+      <app-input
+        label="Data de Devolução"
+        placeholder="dd/mm/aaaa"
+        type="text"
+        formControlName="returnDate"
+        [maxlength]="10"
+        (valueChange)="onCreateReturnDateInput($event)"
+      ></app-input>
+    </div>
+
+    <div class="flex justify-end mt-4 w-full">
+      <app-button
+        [disabled]="createLoanForm.invalid || isCreating"
+        [isLoading]="isCreating"
+        class="bg-teal-900 text-white rounded-2xl w-full"
+      >
+        Criar
+      </app-button>
+    </div>
+  </form>
+</app-modal>
+
+<app-modal
+  [show]="showEditModal()"
+  (close)="closeModal()"
+  title="Editar empréstimo"
+>
+  <form
+    [formGroup]="editLoanForm"
+    (submit)="updateLoan()"
+    class="md:min-w-[35rem]"
+  >
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-sans text-gray-800" for="bookIdEdit"
+          >Livro</label
+        >
+        <div
+          class="input-content flex items-center border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full lg:min-w-[27.5rem]"
+        >
+          @if(isLoadingBooks()) {
+          <app-spinner />
+          } @else {
+          <select
+            id="bookIdEdit"
+            formControlName="bookId"
+            class="w-full outline-none"
+          >
+            <option [value]="null">Selecione um livro</option>
+            @for (book of books(); track book.id) {
+            <option [value]="book.id">{{ book.title }}</option>
+            }
+          </select>
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-sans text-gray-800" for="userIdEdit"
+          >Usuário</label
+        >
+        <div
+          class="input-content flex items-center border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full lg:min-w-[27.5rem]"
+        >
+          @if(isLoadingClients()) {
+          <app-spinner />
+          } @else {
+          <select
+            id="clientIdEdit"
+            formControlName="clientId"
+            class="w-full outline-none"
+          >
+            <option [value]="null">Selecione um usuário</option>
+            @for (client of clients(); track client.id) {
+            <option [value]="client.id">{{ client.name }}</option>
+            }
+          </select>
+          }
+        </div>
+      </div>
+
+      <app-input
+        label="Data do Empréstimo"
+        placeholder="dd/mm/aaaa"
+        type="text"
+        formControlName="loanDate"
+        [maxlength]="10"
+        (valueChange)="onEditLoanDateInput($event)"
+      ></app-input>
+
+      <app-input
+        label="Data esperada de Devolução"
+        placeholder="dd/mm/aaaa"
+        type="text"
+        formControlName="returnDate"
+        [maxlength]="10"
+        (valueChange)="onEditReturnDateInput($event)"
+      ></app-input>
+
+      <app-input
+        label="Data de Devolução"
+        placeholder="dd/mm/aaaa"
+        type="text"
+        formControlName="returnedAt"
+        [maxlength]="10"
+        (valueChange)="onEditReturnDateAtInput($event)"
+      ></app-input>
+    </div>
+
+    <div class="flex justify-end mt-4 w-full">
+      <app-button
+        [disabled]="editLoanForm.invalid || isEditing"
+        [isLoading]="isEditing"
+        type="submit"
+        class="bg-teal-900 text-white rounded-2xl w-full"
+      >
+        Salvar
+      </app-button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- Modal Excluir Empréstimo -->
+<app-modal
+  [show]="showDeleteModal()"
+  (close)="closeModal()"
+  title="Excluir empréstimo"
+>
+  <p class="mb-4 mt-10 max-w-80">
+    Tem certeza que deseja excluir o empréstimo do livro
+    <strong>{{ getBookName(selectedLoan?.bookId ?? 0) }}</strong>
+    para o usuário
+    <strong>{{ getUserName(selectedLoan?.clientId ?? 0) }}</strong
+    >?
+  </p>
+
+  <div class="flex justify-end gap-2 mt-10 w-full">
+    <app-button
+      [disabled]="isDeleting"
+      [isLoading]="isDeleting"
+      (onClick)="confirmDelete()"
+      class="border-red-700 text-red-700 border rounded-2xl w-full"
+    >
+      Confirmar
+    </app-button>
+  </div>
+</app-modal>

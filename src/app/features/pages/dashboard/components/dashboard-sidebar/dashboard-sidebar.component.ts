@@ -15,4 +15,5 @@ export class DashboardSidebarComponent {
   @Input() bookIcon!: any;
   @Input() categoryIcon!: any;
   @Input() bagIcon!: any;
+  @Input() clientIcon!: any;
 }

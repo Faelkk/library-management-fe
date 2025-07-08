@@ -1,3 +1,355 @@
-<app-dashboard-layout>
-  <h2>Books</h2>
+<app-dashboard-layout class="">
+  <section class="p-3 w-full h-full">
+    <!-- Cabeçalho Principal -->
+    <header class="flex gap-4 flex-col md:flex-row justify-between w-full">
+      <section class="flex flex-col gap-2">
+        <h1 class="font-poppins text-2xl text-gray-900 font-bold">
+          Livros Cadastrados
+        </h1>
+        <span class="font-sans text-gray-700">
+          Gerencie o acervo de livros da biblioteca
+        </span>
+      </section>
+
+      <section
+        class="flex flex-col bg-white drop-shadow-sm py-3 px-5 rounded-md gap-2"
+      >
+        <span class="font-poppins text-gray-700 text-sm">
+          Total de livros cadastrados:
+        </span>
+        <span class="font-sans text-gray-900 font-bold">
+          {{ books().length }}
+        </span>
+      </section>
+    </header>
+
+    <section class="flex flex-col w-full flex-1">
+      <header
+        class="flex flex-col gap-2 md:flex-row justify-between w-full md:items-center mt-10"
+      >
+        <h2 class="font-poppins text-gray-800 font-medium">Lista de Livros</h2>
+
+        <app-input
+          placeholder="Ex: Busque por nome, título ou autor"
+          class="w-full md:max-w-[18.75rem] lg:max-w-[27.5rem]"
+          (valueChange)="updateSearch($event)"
+        >
+          <img src="assets/icons/search.svg" alt="Buscar" class="w-5 h-5" />
+        </app-input>
+      </header>
+
+      <div class="mt-10 flex flex-wrap gap-5 max-h-[32rem] overflow-auto">
+        @if (isLoadingBooks()) {
+        <div class="w-full flex justify-center items-center py-10">
+          <app-spinner />
+        </div>
+        } @else if (filteredBooks().length > 0) { @for (book of filteredBooks();
+        track book.id) {
+        <app-book-by-card
+          [id]="book.id"
+          [title]="book.title"
+          [author]="book.author"
+          [publishYear]="book.publishYear"
+          [imageUrl]="book.imageUrl"
+          class="w-full lg:w-auto"
+          (edit)="openEditModal(book)"
+          (delete)="openDeleteModal(book)"
+          (seeMore)="openSeeMoreModal(book)"
+        ></app-book-by-card>
+        } } @else {
+        <p class="text-gray-600 font-sans">
+          Nenhum livro encontrado para esse filtro.
+        </p>
+        }
+      </div>
+
+      <div class="w-full flex justify-end mt-5">
+        <app-button (click)="openAddModal()" className="bg-teal-900">
+          <img src="assets/icons/add.svg" />
+        </app-button>
+      </div>
+    </section>
+  </section>
 </app-dashboard-layout>
+
+<app-modal
+  [show]="showAddModal()"
+  (close)="closeModal()"
+  title="Cadastrar Livro"
+>
+  <form
+    [formGroup]="createBookForm"
+    (submit)="saveBook()"
+    class="md:min-w-[35rem] w-full"
+  >
+    <div class="flex flex-col gap-3">
+      <app-input
+        label="Título do Livro"
+        placeholder="Ex: O Senhor dos Anéis"
+        formControlName="title"
+      />
+
+      <app-input
+        label="Autor"
+        placeholder="Ex: J.R.R. Tolkien"
+        formControlName="author"
+      />
+
+      <app-input
+        label="Ano de Publicação"
+        placeholder="Ex: 1954"
+        type="number"
+        formControlName="publishYear"
+      />
+
+      <app-input
+        label="Descrição"
+        placeholder="Ex: Uma aventura épica pela Terra Média"
+        formControlName="description"
+      />
+
+      <app-input
+        label="Quantidade em Estoque"
+        placeholder="Ex: 5"
+        type="number"
+        formControlName="quantity"
+      />
+
+      <div class="input-wrapper text-base w-full">
+        <label for="imageFile" class="font-sans text-gray-800">
+          Upload da Imagem
+        </label>
+        <div
+          class="input-content flex items-center border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full drop-shadow-sm max-w-full"
+        >
+          <input
+            id="imageFile"
+            name="imageFile"
+            type="file"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            class="flex-1 peer focus:outline-none font-sans placeholder:text-gray-500 text-gray-500 max-w-full"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-sans text-gray-800" for="userIdEdit"
+          >Gêneros</label
+        >
+        <div
+          class="input-content flex items-center border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full lg:min-w-[27.5rem]"
+        >
+          @if(isLoadingGenres()) {
+          <app-spinner />
+          } @else {
+          <select
+            id="genreIdEdit"
+            formControlName="GenreIds"
+            class="w-full outline-none max-h-[60px] flex flex-col gap-2"
+            multiple
+          >
+            @for (genre of genres(); track genre.id) {
+            <option [value]="genre.id" class="">
+              {{ genre.name }}
+            </option>
+
+            }
+          </select>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end mt-4 w-full">
+      <app-button
+        [className]="
+          !createBookForm.invalid ? 'bg-teal-900 text-white rounded-2xl' : ''
+        "
+        class="w-full flex"
+        [disabled]="createBookForm.invalid || isCreating"
+        [isLoading]="isCreating"
+      >
+        Salvar
+      </app-button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- Modal Editar Livro -->
+<app-modal [show]="showEditModal()" (close)="closeModal()" title="Editar Livro">
+  <form
+    [formGroup]="editBookForm"
+    (submit)="updateBook()"
+    class="md:min-w-[35rem] w-full"
+  >
+    <div class="flex flex-col gap-3">
+      <app-input
+        label="Título do Livro"
+        placeholder="Ex: O Senhor dos Anéis"
+        formControlName="title"
+      />
+      <app-input
+        label="Autor"
+        placeholder="Ex: J.R.R. Tolkien"
+        formControlName="author"
+      />
+      <app-input
+        label="Ano de Publicação"
+        placeholder="Ex: 1954"
+        type="number"
+        formControlName="publishYear"
+      />
+      <app-input
+        label="Descrição"
+        placeholder="Ex: Uma aventura épica pela Terra Média"
+        formControlName="description"
+      />
+      <app-input
+        label="Quantidade em Estoque"
+        placeholder="Ex: 5"
+        type="number"
+        formControlName="quantity"
+      />
+      <div class="input-wrapper text-base w-full">
+        <label for="imageFileEdit" class="font-sans text-gray-800">
+          Substituir Imagem (opcional)
+        </label>
+        <div
+          class="input-content flex items-center border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full drop-shadow-sm max-w-full"
+        >
+          <input
+            id="imageFileEdit"
+            name="imageFileEdit"
+            type="file"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            class="flex-1 peer focus:outline-none font-sans placeholder:text-gray-500 text-gray-500 max-w-full"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-sans text-gray-800" for="userIdEdit"
+          >Gêneros</label
+        >
+        <div
+          class="input-content flex items-center border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full lg:min-w-[27.5rem]"
+        >
+          @if(isLoadingGenres()) {
+          <app-spinner />
+          } @else {
+          <select
+            id="genreIdEdit"
+            formControlName="GenreIds"
+            class="w-full outline-none max-h-12"
+            multiple
+          >
+            @for (genre of genres(); track genre.id) {
+            <option [value]="genre.id">{{ genre.name }}</option>
+            }</select
+          >}
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end mt-4 w-full">
+      <app-button
+        [disabled]="editBookForm.invalid || isEditing"
+        [isLoading]="isEditing"
+        className="bg-teal-900 text-white rounded-2xl w-full min-w-[10rem]"
+      >
+        Atualizar
+      </app-button>
+    </div>
+  </form>
+</app-modal>
+
+@if (selectedBook) {
+<app-modal
+  [show]="showSeeMoreModal()"
+  title="Ver informações do livro"
+  (close)="closeModal()"
+>
+  <section class="flex flex-col md:flex-row gap-10 md:min-w-[45rem]">
+    <figure>
+      <img
+        [src]="'http://localhost:5010' + selectedBook.imageUrl"
+        alt="Capa do livro"
+        class="max-h-[15rem] w-full object-contain md:max-h-[30rem] max-w-[30rem]"
+      />
+    </figure>
+    <div class="flex-1">
+      <header class="flex flex-col">
+        <h1 class="font-poppins text-gray-900 font-medium text-2xl">
+          {{ selectedBook.title }}
+        </h1>
+      </header>
+
+      <div class="flex flex-col gap-3 mt-5">
+        <p
+          class="font-sans text-gray-700 md:max-w-[15rem] overflow-hidden break-words line-clamp-4"
+        >
+          <strong class="mr-1">Descrição:</strong>{{ selectedBook.description }}
+        </p>
+
+        <span class="text-gray-700 font-sans flex items-center gap-1">
+          <strong>Autor:</strong> {{ selectedBook.author }}
+        </span>
+
+        <span class="text-gray-700 font-sans flex items-center gap-1">
+          <strong>Ano:</strong> {{ selectedBook.publishYear }}
+        </span>
+
+        <span class="text-gray-700 font-sans flex items-center gap-1">
+          <strong>ID:</strong>
+          <span
+            class="inline-block max-w-[4rem] overflow-hidden text-ellipsis whitespace-nowrap align-middle"
+          >
+            {{ selectedBook.id }}
+          </span>
+        </span>
+        <span class="text-gray-700 font-sans flex items-center gap-1">
+          <strong>Lançamento:</strong>
+          <span
+            class="inline-block max-w-[4rem] overflow-hidden text-ellipsis whitespace-nowrap align-middle"
+          >
+            {{ selectedBook.publishYear }}
+          </span>
+        </span>
+        <span class="text-gray-700 font-sans flex items-center gap-1">
+          <strong>Quantidade:</strong>
+          <span
+            class="inline-block max-w-[4rem] overflow-hidden text-ellipsis whitespace-nowrap align-middle"
+          >
+            {{ selectedBook.quantity }}
+          </span>
+        </span>
+      </div>
+    </div>
+  </section>
+</app-modal>
+}
+
+<app-modal
+  [show]="showDeleteModal()"
+  (close)="closeModal()"
+  title="Excluir Livro"
+>
+  <p class="mb-4 mt-10 max-w-80">
+    Tem certeza que deseja excluir o livro
+    <strong>{{ selectedBook?.title }}</strong
+    >?
+  </p>
+
+  <div class="flex justify-end gap-2 mt-10 w-full">
+    <app-button
+      [disabled]="isDeleting"
+      [isLoading]="isDeleting"
+      (onClick)="confirmDelete()"
+      class="border-red-700 text-red-700 border rounded-2xl w-full"
+    >
+      Confirmar
+    </app-button>
+  </div>
+</app-modal>

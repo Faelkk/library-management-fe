@@ -1,31 +1,36 @@
 <aside
-  class="h-full bg-white rounded-tr-2xl rounded-br-2xl drop-shadow-sm md:min-w-[10rem] lg:min-w-[17.5rem] hidden md:flex md:flex-col"
+  class="h-full bg-white rounded-tr-2xl rounded-br-2xl drop-shadow-sm md:min-w-[10rem] lg:min-w-[17.5rem] hidden md:flex md:flex-col max-h-screen"
 >
- <aside class="h-full bg-white rounded-tr-2xl rounded-br-2xl drop-shadow-sm md:min-w-[10rem] lg:min-w-[17.5rem] hidden md:flex md:flex-col">
-  <app-dashboard-sidebar
-    [personIcon]="personIcon"
-    [bookIcon]="bookIcon"
-    [categoryIcon]="categoryIcon"
-    [bagIcon]="bagIcon"
-  ></app-dashboard-sidebar>
+  <aside
+    class="h-full bg-white rounded-tr-2xl rounded-br-2xl drop-shadow-sm md:min-w-[10rem] lg:min-w-[17.5rem] hidden md:flex md:flex-col max-h-screen"
+  >
+    <app-dashboard-sidebar
+      class="max-h-screen h-full"
+      [personIcon]="personIcon"
+      [bookIcon]="bookIcon"
+      [categoryIcon]="categoryIcon"
+      [bagIcon]="bagIcon"
+      [clientIcon]="clientIcon"
+    ></app-dashboard-sidebar>
+  </aside>
 </aside>
 
-</aside>
-
-<section class="p-3 flex flex-col h-full">
+<section
+  class="p-3 flex flex-col h-full md:hidden bg-white rounded-b-sm drop-shadow-sm"
+>
   <div class="flex w-full items-center justify-between">
     <header class="p-3">
       <h1 class="font-poppins text-gray-800">Library management</h1>
     </header>
-    <button class="bg-gray-50 rounded-full p-1" (click)="toggleModal()">
+    <button class="bg-gray-50 rounded-full p-3" (click)="toggleModal()">
       <img src="/assets/icons/menu.svg" />
     </button>
   </div>
 </section>
 
 @if (showModal) {
-<div class="fixed inset-0 bg-gray-900/10 flex justify-start z-50 md:hidden">
-  <aside class="rounded-tr-2xl rounded-br-2xl drop-shadow-sm w-full flex flex-col">
+<div class="fixed inset-0 bg-gray-900/30 flex justify-start z-50 md:hidden">
+  <aside class="drop-shadow-md w-full flex flex-col md:hidden">
     <app-dashboard-sidebar
       [showCloseButton]="true"
       (close)="toggleModal()"
@@ -33,8 +38,8 @@
       [bookIcon]="bookIcon"
       [categoryIcon]="categoryIcon"
       [bagIcon]="bagIcon"
+      [clientIcon]="clientIcon"
     ></app-dashboard-sidebar>
   </aside>
 </div>
 }
-

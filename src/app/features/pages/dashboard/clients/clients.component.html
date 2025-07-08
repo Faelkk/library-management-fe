@@ -2,20 +2,18 @@
   <section class="p-3 w-full h-full lg:max-h-screen">
     <header class="flex gap-4 flex-col md:flex-row justify-between w-full">
       <section class="flex flex-col gap-2">
-        <h1 class="font-poppins text-2xl text-gray-900 font-bold">Usuários</h1>
-        <span class="font-sans text-gray-700">
-          Monitore os usuários e o acesso deles
-        </span>
+        <h1 class="font-poppins text-2xl text-gray-900 font-bold">Clientes</h1>
+        <span class="font-sans text-gray-700"> Monitore os clientes </span>
       </section>
 
       <section
         class="flex flex-col bg-white drop-shadow-sm py-3 px-5 rounded-md gap-2"
       >
         <span class="font-poppins text-gray-700 text-sm">
-          Número total de usuários:
+          Número total de clientes:
         </span>
         <span class="font-sans text-gray-900 font-bold">
-          {{ users().length }}
+          {{ clients().length }}
         </span>
       </section>
     </header>
@@ -25,11 +23,11 @@
         class="flex flex-col gap-2 md:flex-row justify-between w-full md:items-center mt-10"
       >
         <h2 class="font-poppins text-gray-800 font-medium">
-          Lista de usuários
+          Lista de clientes
         </h2>
 
         <app-input
-          placeholder="Procure um usuario"
+          placeholder="Procure um cliente"
           class="w-full md:max-w-[18.75rem] lg:max-w-[27.5rem]"
           (valueChange)="updateSearch($event)"
         >
@@ -38,31 +36,28 @@
       </header>
 
       <div class="mt-10 flex flex-wrap gap-5 max-h-[32rem] overflow-auto">
-        @if (isLoadingUsers()) {
+        @if (isLoadingClients()) {
         <div class="w-full flex justify-center items-center py-10">
           <app-spinner />
         </div>
-        } @else if (filteredUsers().length === 0 ) {
-        <p class="text-gray-500 text-center w-full">
-          Nenhum usuario encontrado
-        </p>
-
-        } @else { @for (user of filteredUsers(); track user.id) {
-        <app-user-card
-          [name]="user.name"
-          [role]="user.role"
-          [id]="user.id"
-          [email]="user.email"
-          [phoneNumber]="user.phoneNumber"
+        } @else if (filteredClients().length > 0) { @for (client of
+        filteredClients(); track client.id) {
+        <app-client-card
+          [name]="client.name"
+          [id]="client.id"
+          [email]="client.email"
+          [phoneNumber]="client.phoneNumber"
           class="w-full lg:w-auto"
-          (edit)="openEditModal(user)"
-          (delete)="openDeleteModal(user)"
-        ></app-user-card>
-        }}
+          (edit)="openEditModal(client)"
+          (delete)="openDeleteModal(client)"
+        ></app-client-card>
+        } } @else {
+        <p class="text-gray-600 font-sans">Nenhum cliente encontrado.</p>
+        }
       </div>
 
       <div class="w-full flex justify-end mt-5">
-        <app-button (onClick)="openModal()" className="bg-teal-900">
+        <app-button (click)="openModal()" className="bg-teal-900">
           <img src="assets/icons/add.svg" />
         </app-button>
       </div>
@@ -73,12 +68,16 @@
 <app-modal
   [show]="showAddModal()"
   (close)="closeModal()"
-  title="Adicionar Usuário"
+  title="Adicionar cliente"
 >
-  <form [formGroup]="createForm" (submit)="saveUser()" class="md:min-w-[35rem]">
+  <form
+    [formGroup]="createForm"
+    (submit)="saveClient()"
+    class="md:min-w-[35rem]"
+  >
     <div class="flex flex-col gap-3">
       <app-input
-        label="Nome do Usuário"
+        label="Nome do cliente"
         placeholder="Ex: João Silva"
         formControlName="name"
       ></app-input>
@@ -98,25 +97,6 @@
         [maxlength]="15"
         (valueChange)="createForm.get('phoneNumber')?.setValue($event)"
       ></app-input>
-
-      <app-input
-        label="Senha"
-        placeholder="Sua senha de login"
-        formControlName="password"
-        inputName="password"
-        type="text"
-      ></app-input>
-
-      <div class="flex flex-col gap-1">
-        <label class="text-sm font-sans text-gray-800">Cargo</label>
-        <select
-          class="border border-gray-300 rounded-lg p-2"
-          formControlName="role"
-        >
-          <option value="User">User</option>
-          <option value="Admin">Admin</option>
-        </select>
-      </div>
     </div>
 
     <div class="flex justify-end gap-2 mt-4 w-full">
@@ -137,12 +117,12 @@
 <app-modal
   [show]="showEditModal()"
   (close)="closeModal()"
-  title="Editar Usuário"
+  title="Editar Cliente"
 >
-  <form [formGroup]="editForm" (submit)="updateUser()">
+  <form [formGroup]="editForm" (submit)="updateClient()">
     <div class="flex flex-col gap-3">
       <app-input
-        label="Nome do Usuário"
+        label="Nome do Cliente"
         placeholder="Ex: João Silva"
         formControlName="name"
       ></app-input>
@@ -162,18 +142,6 @@
         [maxlength]="15"
         (valueChange)="editForm.get('phoneNumber')?.setValue($event)"
       ></app-input>
-
-      <div class="flex flex-col gap-1">
-        <label class="text-sm font-sans text-gray-800">Cargo</label>
-        <div
-          class="input-content flex items-center border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full lg:min-w-[27.5rem]"
-        >
-          <select class="w-full" formControlName="role">
-            <option value="User">User</option>
-            <option value="Admin">Admin</option>
-          </select>
-        </div>
-      </div>
     </div>
 
     <div class="flex justify-end gap-2 mt-4 w-full">
@@ -191,11 +159,11 @@
 <app-modal
   [show]="showDeleteModal()"
   (close)="closeModal()"
-  title="Excluir Usuário"
+  title="Excluir Cliente"
 >
   <p class="mb-4 mt-10 max-w-80">
-    Tem certeza que deseja excluir o usuário
-    <strong>{{ selectedUser?.name }}</strong
+    Tem certeza que deseja excluir o cliente
+    <strong>{{ selectedClient?.name }}</strong
     >?
   </p>
 
