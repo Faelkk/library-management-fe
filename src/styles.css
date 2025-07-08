@@ -1,5 +1,5 @@
-/* Import Tailwind */
 @import "tailwindcss";
+@import 'ngx-toastr/toastr';
 
 @theme {
   --color-gray-50: #F8F9FA;
@@ -154,4 +154,25 @@
 
 @theme {
   --breakpoint-sm: 23.75rem;
+  --breakpoint-smd: 26.875rem
 }
+
+
+img {
+  display: block;
+}
+
+
+button {
+  user-select: none;
+}
+
+
+img {
+  user-drag: none;
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
+
+}
+
