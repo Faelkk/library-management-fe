@@ -1,0 +1,16 @@
+<div class="input-wrapper text-base">
+  <label [for]="inputName" class="font-sans text-gray-800">{{ label }}</label>
+
+  <div class="input-content">
+    <input
+      [id]="inputName"
+      [type]="type"
+      [placeholder]="placeholder"
+      [value]="value"
+      (input)="onInput($event)"
+      [attr.maxlength]="maxlength"
+      class="border border-gray-300 rounded-lg bg-white px-3 h-[3.25rem] text-gray-800 max-w-full peer placeholder-shown:pt-0 focus:border-gray-800 transition-all w-full outline-none font-sans md:min-w-[27.5rem] placeholder:text-gray-500"
+    />
+
+  </div>
+</div>
