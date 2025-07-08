@@ -20,7 +20,7 @@ export class DashboardServiceService {
   constructor(private httpClient: HttpClient) {}
 
   getAllUsers(token: string) {
-    return this.httpClient.get('/user', {
+    return this.httpClient.get<User[]>('/user', {
       headers: { Authorization: `Bearer ${token}` },
     });
   }

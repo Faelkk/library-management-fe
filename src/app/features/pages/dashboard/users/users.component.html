@@ -1,212 +1,38 @@
 <app-dashboard-layout>
   <section class="p-3 w-full h-full lg:max-h-screen">
-    <header class="flex gap-4 flex-col md:flex-row justify-between w-full">
-      <section class="flex flex-col gap-2">
-        <h1 class="font-poppins text-2xl text-gray-900 font-bold">Usuários</h1>
-        <span class="font-sans text-gray-700">
-          Monitore os usuários e o acesso deles
-        </span>
-      </section>
+    <app-users-header [totalUsers]="users().length"></app-users-header>
 
-      <section
-        class="flex flex-col bg-white drop-shadow-sm py-3 px-5 rounded-md gap-2"
-      >
-        <span class="font-poppins text-gray-700 text-sm">
-          Número total de usuários:
-        </span>
-        <span class="font-sans text-gray-900 font-bold">
-          {{ users().length }}
-        </span>
-      </section>
-    </header>
+    <app-users-list
+      [users]="filteredUsers()"
+      [isLoading]="isLoadingUsers()"
+      (searchChange)="updateSearch($event)"
+      (editUser)="openEditModal($event)"
+      (deleteUser)="openDeleteModal($event)"
+      (addUser)="openModal()"
+    ></app-users-list>
 
-    <section class="flex flex-col w-full flex-1">
-      <header
-        class="flex flex-col gap-2 md:flex-row justify-between w-full md:items-center mt-10"
-      >
-        <h2 class="font-poppins text-gray-800 font-medium">
-          Lista de usuários
-        </h2>
+    <app-user-create-modal
+      [show]="showAddModal()"
+      (close)="closeModal()"
+      [form]="userService.createForm"
+      (save)="saveUser()"
+      [isLoading]="isCreating()"
+    ></app-user-create-modal>
 
-        <app-input
-          placeholder="Procure um usuario"
-          class="w-full md:max-w-[18.75rem] lg:max-w-[27.5rem]"
-          (valueChange)="updateSearch($event)"
-        >
-          <img src="assets/icons/search.svg" alt="Search" class="w-5 h-5" />
-        </app-input>
-      </header>
+    <app-user-edit-modal
+      [show]="showEditModal()"
+      (close)="closeModal()"
+      [form]="userService.editForm"
+      (update)="updateUser()"
+      [isLoading]="isEditing()"
+    ></app-user-edit-modal>
 
-      <div class="mt-10 flex flex-wrap gap-5 max-h-[32rem] overflow-auto">
-        @if (isLoadingUsers()) {
-        <div class="w-full flex justify-center items-center py-10">
-          <app-spinner />
-        </div>
-        } @else if (filteredUsers().length === 0 ) {
-        <p class="text-gray-500 text-center w-full">
-          Nenhum usuario encontrado
-        </p>
-
-        } @else { @for (user of filteredUsers(); track user.id) {
-        <app-user-card
-          [name]="user.name"
-          [role]="user.role"
-          [id]="user.id"
-          [email]="user.email"
-          [phoneNumber]="user.phoneNumber"
-          class="w-full lg:w-auto"
-          (edit)="openEditModal(user)"
-          (delete)="openDeleteModal(user)"
-        ></app-user-card>
-        }}
-      </div>
-
-      <div class="w-full flex justify-end mt-5">
-        <app-button (onClick)="openModal()" className="bg-teal-900">
-          <img src="assets/icons/add.svg" />
-        </app-button>
-      </div>
-    </section>
+    <app-user-delete-modal
+      [show]="showDeleteModal()"
+      (close)="closeModal()"
+      [user]="selectedUser"
+      (confirmDelete)="confirmDelete()"
+      [isLoading]="isDeleting()"
+    ></app-user-delete-modal>
   </section>
 </app-dashboard-layout>
-
-<app-modal
-  [show]="showAddModal()"
-  (close)="closeModal()"
-  title="Adicionar Usuário"
->
-  <form [formGroup]="createForm" (submit)="saveUser()" class="md:min-w-[35rem]">
-    <div class="flex flex-col gap-3">
-      <app-input
-        label="Nome do Usuário"
-        placeholder="Ex: João Silva"
-        formControlName="name"
-      ></app-input>
-
-      <app-input
-        label="Email"
-        placeholder="Ex: joao@email.com"
-        formControlName="email"
-        type="email"
-      ></app-input>
-
-      <app-input
-        label="Telefone"
-        placeholder="Ex: (11) 99999-9999"
-        formControlName="phoneNumber"
-        inputName="phoneNumber"
-        [maxlength]="15"
-        (valueChange)="createForm.get('phoneNumber')?.setValue($event)"
-      ></app-input>
-
-      <app-input
-        label="Senha"
-        placeholder="Sua senha de login"
-        formControlName="password"
-        inputName="password"
-        type="text"
-      ></app-input>
-
-      <div class="flex flex-col gap-1">
-        <label class="text-sm font-sans text-gray-800">Cargo</label>
-        <select
-          class="border border-gray-300 rounded-lg p-2"
-          formControlName="role"
-        >
-          <option value="User">User</option>
-          <option value="Admin">Admin</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="flex justify-end gap-2 mt-4 w-full">
-      <app-button
-        class="w-full flex"
-        [className]="
-          !createForm.invalid ? 'bg-teal-900 text-white rounded-2xl' : ''
-        "
-        [disabled]="createForm.invalid || isCreating"
-        [isLoading]="isCreating"
-      >
-        Salvar
-      </app-button>
-    </div>
-  </form>
-</app-modal>
-
-<app-modal
-  [show]="showEditModal()"
-  (close)="closeModal()"
-  title="Editar Usuário"
->
-  <form [formGroup]="editForm" (submit)="updateUser()">
-    <div class="flex flex-col gap-3">
-      <app-input
-        label="Nome do Usuário"
-        placeholder="Ex: João Silva"
-        formControlName="name"
-      ></app-input>
-
-      <app-input
-        label="Email"
-        placeholder="Ex: joao@email.com"
-        formControlName="email"
-        type="email"
-      ></app-input>
-
-      <app-input
-        label="Telefone"
-        placeholder="Ex: (11) 99999-9999"
-        formControlName="phoneNumber"
-        inputName="phoneNumber"
-        [maxlength]="15"
-        (valueChange)="editForm.get('phoneNumber')?.setValue($event)"
-      ></app-input>
-
-      <div class="flex flex-col gap-1">
-        <label class="text-sm font-sans text-gray-800">Cargo</label>
-        <div
-          class="input-content flex items-center border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full lg:min-w-[27.5rem]"
-        >
-          <select class="w-full" formControlName="role">
-            <option value="User">User</option>
-            <option value="Admin">Admin</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex justify-end gap-2 mt-4 w-full">
-      <app-button
-        class="bg-teal-900 text-white rounded-2xl w-full"
-        [disabled]="editForm.invalid || isEditing"
-        [isLoading]="isEditing"
-      >
-        Atualizar
-      </app-button>
-    </div>
-  </form>
-</app-modal>
-
-<app-modal
-  [show]="showDeleteModal()"
-  (close)="closeModal()"
-  title="Excluir Usuário"
->
-  <p class="mb-4 mt-10 max-w-80">
-    Tem certeza que deseja excluir o usuário
-    <strong>{{ selectedUser?.name }}</strong
-    >?
-  </p>
-
-  <div class="flex justify-end gap-2 mt-10 w-full">
-    <app-button
-      class="border-red-700 text-red-700 border rounded-2xl w-full"
-      [disabled]="isDeleting"
-      [isLoading]="isDeleting"
-      (onClick)="confirmDelete()"
-    >
-      Confirmar
-    </app-button>
-  </div>
-</app-modal>

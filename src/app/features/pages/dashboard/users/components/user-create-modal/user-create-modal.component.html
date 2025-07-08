@@ -1,0 +1,57 @@
+<app-modal [show]="show" (close)="onClose()" title="Adicionar Usuário">
+  <form [formGroup]="form" (submit)="onSubmit()" class="md:min-w-[35rem]">
+    <div class="flex flex-col gap-3">
+      <app-input
+        label="Nome do Usuário"
+        placeholder="Ex: João Silva"
+        formControlName="name"
+      ></app-input>
+
+      <app-input
+        label="Email"
+        placeholder="Ex: joao@email.com"
+        formControlName="email"
+        type="email"
+      ></app-input>
+
+      <app-input
+        label="Telefone"
+        placeholder="Ex: (11) 99999-9999"
+        formControlName="phoneNumber"
+        inputName="phoneNumber"
+        [maxlength]="15"
+        (valueChange)="form.get('phoneNumber')?.setValue($event)"
+      ></app-input>
+
+      <app-input
+        label="Senha"
+        placeholder="Sua senha de login"
+        formControlName="password"
+        inputName="password"
+        type="text"
+      ></app-input>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-sans text-gray-800">Cargo</label>
+        <select
+          class="border border-gray-300 rounded-lg p-2"
+          formControlName="role"
+        >
+          <option value="User">User</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2 mt-4 w-full">
+      <app-button
+        class="w-full flex"
+        [className]="!form.invalid ? 'bg-teal-900 text-white rounded-2xl' : ''"
+        [disabled]="form.invalid || isLoading"
+        [isLoading]="isLoading"
+      >
+        Salvar
+      </app-button>
+    </div>
+  </form>
+</app-modal>
