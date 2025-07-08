@@ -4,7 +4,6 @@ import { Component, Inject, Optional } from '@angular/core';
   selector: 'app-bag',
   templateUrl: './bag.component.html',
   styleUrl: './bag.component.css',
-  standalone: true,
 })
 export class BagComponent {
   color = '#495057';
