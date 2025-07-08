@@ -38,7 +38,7 @@
       <app-input
         formControlName="password"
         inputName="password"
-        type="password"
+        type="text"
         label="Sua senha"
       ></app-input>
 
@@ -51,9 +51,9 @@
 
       <app-button
         [disabled]="!signupForm.valid || isLoading"
-        [type]="'submit'"
         [isLoading]="isLoading"
         (onClick)="submit()"
+        className="w-full max-w-full"
         >Criar conta</app-button
       >
     </form>

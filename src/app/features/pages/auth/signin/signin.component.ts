@@ -7,9 +7,9 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { AuthServiceService } from '../auth-service.service';
-import { InputComponent } from '../../../../shared/components/input/input.component';
-import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { AuthServiceService } from '../services/auth-service.service';
+import { InputComponent } from '../components/input/input.component';
+import { ButtonComponent } from '../components/button/button.component';
 import { AuthHeaderComponent } from '../components/auth-header/auth-header.component';
 
 interface SigninForm {

@@ -1,15 +1,15 @@
 <main class="flex h-screen justify-center items-center">
   <section class="px-4">
     <app-auth-header
-  [title]="'Fazer login'"
-  [subtitle]="'Ainda não possui conta?'"
-  [linkText]="'Criar uma conta'"
-  [link]="'auth/signup'"
-></app-auth-header>
+      [title]="'Fazer login'"
+      [subtitle]="'Ainda não possui conta?'"
+      [linkText]="'Criar uma conta'"
+      [link]="'auth/signup'"
+    ></app-auth-header>
 
     <form
       [formGroup]="signinForm"
-      (ngSubmit)="submit()"
+      (submit)="submit()"
       class="mt-5 flex flex-col gap-2"
     >
       <app-input
@@ -23,22 +23,22 @@
       <app-input
         formControlName="password"
         inputName="password"
-        type="password"
+        type="text"
         label="Sua senha"
       ></app-input>
 
       <a
-         (click)="navigate()"
+        (click)="navigate()"
         class="text-teal-900 font-poppins font-medium mt-5 cursor-pointer"
       >
-       Esqueceu sua senha?
+        Esqueceu sua senha?
       </a>
 
       <app-button
         [disabled]="!signinForm.valid || isLoading"
-        [type]="'submit'"
         [isLoading]="isLoading"
         (onClick)="submit()"
+        className="w-full max-w-full"
       >
         Entrar
       </app-button>
