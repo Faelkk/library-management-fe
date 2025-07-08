@@ -15,7 +15,7 @@ import { ClientCardComponent } from '../clients/components/clients/client-card/c
 import { ToastrService } from 'ngx-toastr';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 
-interface User {
+export interface User {
   id: number;
   name: string;
   role: string;
@@ -148,13 +148,13 @@ export class UsersComponent {
     };
 
     this.dashboardService.createUser(payload, token).subscribe({
-      next: () => {
-        this.toastService.success('Usuario criado com sucesso');
-        this.loadUsers();
+      next: (newUser: User) => {
+        this.toastService.success('Usuário criado com sucesso');
+        this.users.update((prev) => [...prev, newUser]);
         this.closeModal();
       },
-      error: (err) => {
-        this.toastService.error('Erro ao criar usuario');
+      error: () => {
+        this.toastService.error('Erro ao criar usuário');
         this.isCreating = false;
         this.closeModal();
       },
@@ -193,13 +193,15 @@ export class UsersComponent {
     this.dashboardService
       .editUser(this.selectedUser.id, payload, token)
       .subscribe({
-        next: () => {
-          this.toastService.success('Usuario editado com sucesso');
-          this.loadUsers();
+        next: (updatedUser: User) => {
+          this.toastService.success('Usuário editado com sucesso');
+          this.users.update((prev) =>
+            prev.map((u) => (u.id === updatedUser.id ? updatedUser : u))
+          );
           this.closeModal();
         },
-        error: (err) => {
-          this.toastService.error('Erro ao editar usuario');
+        error: () => {
+          this.toastService.error('Erro ao editar usuário');
           this.isEditing = false;
           this.closeModal();
         },
@@ -219,12 +221,14 @@ export class UsersComponent {
 
     this.dashboardService.deleteUser(this.selectedUser.id, token).subscribe({
       next: () => {
-        this.toastService.success('Usuario deletado com sucesso');
-        this.loadUsers();
+        this.toastService.success('Usuário deletado com sucesso');
+        this.users.update((prev) =>
+          prev.filter((u) => u.id !== this.selectedUser?.id)
+        );
         this.closeModal();
       },
-      error: (err) => {
-        this.toastService.error('Erro ao deletar usuario');
+      error: () => {
+        this.toastService.error('Erro ao deletar usuário');
         this.isDeleting = false;
         this.closeModal();
       },

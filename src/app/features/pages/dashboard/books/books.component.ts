@@ -187,9 +187,9 @@ export class BooksComponent {
     });
 
     this.dashboardService.createBook(formData, token).subscribe({
-      next: () => {
+      next: (createdBook) => {
         this.toastService.success('Livro criado com sucesso');
-        this.loadBooks();
+        this.books.update((books) => [...books, createdBook]);
         this.closeModal();
       },
       error: (err) => {
@@ -228,9 +228,13 @@ export class BooksComponent {
     this.dashboardService
       .editBook(this.selectedBook.id, formData, token)
       .subscribe({
-        next: () => {
+        next: (updatedBook) => {
           this.toastService.success('Livro editado com sucesso');
-          this.loadBooks();
+          this.books.update((books) =>
+            books.map((book) =>
+              book.id === updatedBook.id ? updatedBook : book
+            )
+          );
           this.closeModal();
         },
         error: (err) => {
@@ -255,7 +259,9 @@ export class BooksComponent {
     this.dashboardService.deleteBook(this.selectedBook.id, token).subscribe({
       next: () => {
         this.toastService.success('Livro deletado com sucesso');
-        this.loadBooks();
+        this.books.update((books) =>
+          books.filter((book) => book.id !== this.selectedBook!.id)
+        );
         this.closeModal();
       },
       error: (err) => {

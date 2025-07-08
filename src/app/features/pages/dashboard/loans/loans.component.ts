@@ -339,9 +339,9 @@ export class LoansComponent {
         token
       )
       .subscribe({
-        next: () => {
+        next: (createdLoan: Loan) => {
           this.toastService.success('Empréstimo criado com sucesso!');
-          this.loadLoans();
+          this.loans.update((loans) => [...loans, createdLoan]);
           this.closeModal();
         },
         error: (err) => {
@@ -398,9 +398,13 @@ export class LoansComponent {
         token
       )
       .subscribe({
-        next: () => {
+        next: (updatedLoan: Loan) => {
           this.toastService.success('Empréstimo editado com sucesso!');
-          this.loadLoans();
+          this.loans.update((loans) =>
+            loans.map((loan) =>
+              loan.id === updatedLoan.id ? updatedLoan : loan
+            )
+          );
           this.closeModal();
         },
         error: (err) => {
@@ -425,7 +429,9 @@ export class LoansComponent {
     this.dashboardService.deleteLoan(this.selectedLoan.id, token).subscribe({
       next: () => {
         this.toastService.success('Empréstimo deletado com sucesso!');
-        this.loadLoans();
+        this.loans.update((loans) =>
+          loans.filter((loan) => loan.id !== this.selectedLoan!.id)
+        );
         this.closeModal();
       },
       error: (err) => {

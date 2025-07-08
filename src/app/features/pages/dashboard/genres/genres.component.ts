@@ -125,12 +125,14 @@ export class GenresComponent {
     };
 
     this.dashboardService.createGenre(payload, token).subscribe({
-      next: () => {
+      next: (newGenre: Genre) => {
         this.toastService.success('Gênero criado com sucesso');
-        this.loadGenres();
+
+        this.genres.update((genres) => [...genres, newGenre]);
+
         this.closeModal();
       },
-      error: (err) => {
+      error: () => {
         this.toastService.error('Erro ao criar gênero');
         this.isCreating = false;
         this.closeModal();
@@ -147,7 +149,7 @@ export class GenresComponent {
     const token = localStorage.getItem('auth-token');
     if (!token) return;
 
-    this.isEditing = false;
+    this.isEditing = true;
 
     const payload = {
       name: this.editGenreForm.value.name!,
@@ -166,12 +168,14 @@ export class GenresComponent {
     this.dashboardService
       .editGenre(this.selectedGenre.id, payload, token)
       .subscribe({
-        next: () => {
+        next: (updatedGenre: Genre) => {
           this.toastService.success('Gênero editado com sucesso');
-          this.loadGenres();
+          this.genres.update((genres) =>
+            genres.map((g) => (g.id === updatedGenre.id ? updatedGenre : g))
+          );
           this.closeModal();
         },
-        error: (err) => {
+        error: () => {
           this.toastService.error('Erro ao editar gênero');
           this.isEditing = false;
           this.closeModal();
@@ -193,10 +197,14 @@ export class GenresComponent {
     this.dashboardService.deleteGenre(this.selectedGenre.id, token).subscribe({
       next: () => {
         this.toastService.success('Gênero deletado com sucesso');
-        this.loadGenres();
+
+        this.genres.update((genres) =>
+          genres.filter((g) => g.id !== this.selectedGenre!.id)
+        );
+
         this.closeModal();
       },
-      error: (err) => {
+      error: () => {
         this.toastService.error('Erro ao deletar gênero');
         this.isDeleting = false;
         this.closeModal();

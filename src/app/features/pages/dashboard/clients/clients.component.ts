@@ -128,9 +128,9 @@ export class ClientsComponent {
     };
 
     this.dashboardService.createClient(payload, token).subscribe({
-      next: () => {
+      next: (newClient: Client) => {
         this.toastService.success('cliente criado com sucesso');
-        this.loadClients();
+        this.clients.update((clients) => [...clients, newClient]);
         this.closeModal();
       },
       error: (err) => {
@@ -171,9 +171,13 @@ export class ClientsComponent {
     this.dashboardService
       .editClient(this.selectedClient.id, payload, token)
       .subscribe({
-        next: () => {
+        next: (updateClient) => {
           this.toastService.success('cliente editado com sucesso');
-          this.loadClients();
+          this.clients.update((clients) =>
+            clients.map((client) =>
+              client.id === updateClient.id ? updateClient : client
+            )
+          );
           this.closeModal();
         },
         error: (err) => {
@@ -200,9 +204,12 @@ export class ClientsComponent {
       .subscribe({
         next: () => {
           this.toastService.success('cliente deletado com sucesso');
-          this.loadClients();
+          this.clients.update((clients) =>
+            clients.filter((c) => c.id !== this.selectedClient?.id)
+          );
           this.closeModal();
         },
+
         error: (err) => {
           this.toastService.error('Erro ao deletar cliente');
           this.isDeleting = false;

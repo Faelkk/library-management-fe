@@ -38,7 +38,7 @@ export interface EditGenrePayload {
 export interface Loan {
   id: number;
   bookId: number;
-  userId: number;
+  clientId: number;
   loanDate: Date;
   returnDate: Date;
   returnedAt?: Date | null;
