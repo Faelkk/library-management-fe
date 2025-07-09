@@ -1,0 +1,21 @@
+<app-modal [show]="show" (close)="onClose()" title="Excluir empréstimo">
+  <p class="mb-4 mt-10 max-w-80">
+    Tem certeza que deseja excluir o empréstimo do livro
+    <strong>{{ bookname }}</strong>
+    para o usuário >?
+  </p>
+
+  <div class="flex justify-end gap-2 mt-10 w-full">
+    <app-button
+      [disabled]="isLoading"
+      [isLoading]="isLoading"
+      (onClick)="onConfirm()"
+      class="border-red-700 text-red-700 border rounded-2xl w-full"
+    >
+      Confirmar
+    </app-button>
+  </div>
+</app-modal>
+
+<!-- {{ loanService.getBookName(selectedLoan?.bookId ?? 0) }} -->
+<!-- {{ loanService.getUserName(selectedLoan?.clientId ?? 0) }} -->

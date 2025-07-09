@@ -1,0 +1,80 @@
+<app-modal [show]="show" (close)="onClose()" title="Criar empréstimo">
+  <form [formGroup]="form" (submit)="onSubmit()" class="md:min-w-[35rem]">
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-sans text-gray-800" for="bookId"
+          >Livro</label
+        >
+        <div
+          class="input-content flex items-center border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full lg:min-w-[27.5rem]"
+        >
+          @if(isLoadingBooks) {
+          <app-spinner />
+          } @else {
+          <select
+            id="bookId"
+            formControlName="bookId"
+            class="w-full outline-none"
+          >
+            <option [value]="null">Selecione um livro</option>
+            @for (book of books; track book.id) {
+            <option [value]="book.id">{{ book.title }}</option>
+            }
+          </select>
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-sans text-gray-800" for="clientId"
+          >Cliente</label
+        >
+        <div
+          class="input-content flex items-center border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full lg:min-w-[27.5rem]"
+        >
+          @if(isLoadingClients) {
+          <app-spinner />
+          } @else {
+          <select
+            id="clientId"
+            formControlName="clientId"
+            class="w-full outline-none"
+          >
+            <option [value]="null">Selecione um usuário</option>
+            @for (client of clients; track client.id) {
+            <option [value]="client.id">{{ client.name }}</option>
+            }</select
+          >}
+        </div>
+      </div>
+
+      <app-input
+        label="Data do Empréstimo"
+        placeholder="dd/mm/aaaa"
+        type="text"
+        formControlName="loanDate"
+        [maxlength]="10"
+        (valueChange)="onCreateLoanDateInput($event)"
+      ></app-input>
+
+      <app-input
+        label="Data de Devolução"
+        placeholder="dd/mm/aaaa"
+        type="text"
+        formControlName="returnDate"
+        [maxlength]="10"
+        (valueChange)="onCreateReturnDateInput($event)"
+      ></app-input>
+    </div>
+
+    <div class="flex justify-end mt-4 w-full">
+      <app-button
+        [disabled]="form.invalid || isLoading"
+        [isLoading]="isLoading"
+        class="bg-teal-900 text-white rounded-2xl w-full"
+      >
+        Criar
+      </app-button>
+    </div>
+  </form>
+</app-modal>

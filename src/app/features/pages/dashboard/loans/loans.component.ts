@@ -16,6 +16,12 @@ import { Client } from '../clients/clients.component';
 import { Book } from '../books/books.component';
 import { ToastrService } from 'ngx-toastr';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
+import { LoansService } from './loans.service';
+import { LoanDeleteModalComponent } from './components/loan-delete-modal/loan-delete-modal.component';
+import { LoanEditModalComponent } from './components/loan-edit-modal/loan-edit-modal.component';
+import { LoanCreateModalComponent } from './components/loan-create-modal/loan-create-modal.component';
+import { LoanListComponent } from './components/loan-list/loan-list.component';
+import { LoanHeaderComponent } from './components/loan-header/loan-header.component';
 
 interface Loan {
   id: number;
@@ -30,140 +36,67 @@ interface Loan {
   selector: 'app-loans',
   imports: [
     DashboardLayoutComponent,
-    InputComponent,
-    ButtonComponent,
-    ModalComponent,
-    ReactiveFormsModule,
-    LoanCardComponent,
-    DropdownComponent,
-    SpinnerComponent,
+    LoanDeleteModalComponent,
+    LoanEditModalComponent,
+    LoanCreateModalComponent,
+    LoanListComponent,
+    LoanHeaderComponent,
   ],
   templateUrl: './loans.component.html',
   styleUrl: './loans.component.css',
 })
 export class LoansComponent {
-  constructor(
-    private dashboardService: DashboardServiceService,
-    private toastService: ToastrService
-  ) {
-    this.loadBooks();
-    this.loadClients();
-    this.loadLoans();
+  constructor(public loanService: LoansService) {
+    this.loanService.loadBooks();
+    this.loanService.loadLoans();
+    this.loanService.loadClients();
   }
-
-  clients = signal<Client[]>([]);
-  books = signal<Book[]>([]);
-  loans = signal<Loan[]>([]);
 
   showDropdownYearOpen = signal(false);
   showDropdownMonthOpen = signal(false);
   showAddModal = signal(false);
   showEditModal = signal(false);
   showDeleteModal = signal(false);
-  isCreating: boolean = false;
-  isEditing: boolean = false;
-  isDeleting: boolean = false;
-  isLoadingLoans = signal<boolean>(false);
-  isLoadingBooks = signal<boolean>(true);
-  isLoadingClients = signal<boolean>(true);
+  isCreating = signal(false);
+  isEditing = signal(false);
+  isDeleting = signal(false);
 
   selectedLoan: Loan | null = null;
 
-  search = signal<string>('');
-  selectedMonth = signal(new Date().getMonth() + 1);
-  selectedYear = signal(new Date().getFullYear());
-
-  months = [
-    { value: 1, label: 'Janeiro' },
-    { value: 2, label: 'Fevereiro' },
-    { value: 3, label: 'Março' },
-    { value: 4, label: 'Abril' },
-    { value: 5, label: 'Maio' },
-    { value: 6, label: 'Junho' },
-    { value: 7, label: 'Julho' },
-    { value: 8, label: 'Agosto' },
-    { value: 9, label: 'Setembro' },
-    { value: 10, label: 'Outubro' },
-    { value: 11, label: 'Novembro' },
-    { value: 12, label: 'Dezembro' },
-  ];
-
-  years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
-
-  createLoanForm = new FormGroup({
-    bookId: new FormControl<number | null>(null, [
-      Validators.required,
-      Validators.min(1),
-    ]),
-    clientId: new FormControl<number | null>(null, [
-      Validators.required,
-      Validators.min(1),
-    ]),
-    loanDate: new FormControl('', [Validators.required]),
-    returnDate: new FormControl('', [Validators.required]),
-  });
-
-  editLoanForm = new FormGroup({
-    bookId: new FormControl<number | null>(null, [
-      Validators.required,
-      Validators.min(1),
-    ]),
-    clientId: new FormControl<number | null>(null, [
-      Validators.required,
-      Validators.min(1),
-    ]),
-    loanDate: new FormControl('', [Validators.required]),
-    returnDate: new FormControl('', [Validators.required]),
-    returnedAt: new FormControl(''),
-  });
-
-  filteredLoans = computed(() => {
-    const term = this.search().toLowerCase().trim();
-    const selectedMonth = this.selectedMonth();
-    const selectedYear = this.selectedYear();
-
-    return this.loans().filter((loan) => {
-      const matchesSearch =
-        !term ||
-        loan.id.toString().includes(term) ||
-        this.getBookName(loan.bookId).toLowerCase().includes(term) ||
-        this.getUserName(loan.clientId).toLowerCase().includes(term);
-
-      const matchesMonth =
-        !selectedMonth ||
-        new Date(loan.loanDate).getMonth() + 1 === selectedMonth;
-
-      const matchesYear =
-        !selectedYear || new Date(loan.loanDate).getFullYear() === selectedYear;
-
-      return matchesSearch && matchesMonth && matchesYear;
-    });
-  });
-
-  getBookName(bookId: number) {
-    return (
-      this.books().find((b) => b.id === bookId)?.title || 'Livro desconhecido'
-    );
+  get books() {
+    return this.loanService.books;
   }
 
-  getUserName(clientId: number) {
-    return (
-      this.clients().find((u) => u.id === clientId)?.name ||
-      'Usuário desconhecido'
-    );
+  get clients() {
+    return this.loanService.clients;
+  }
+
+  get filteredLoans() {
+    return this.loanService.filteredLoans;
+  }
+
+  get isLoadingBooks() {
+    return this.loanService.isLoadingBooks;
+  }
+
+  get isLoadingLoans() {
+    return this.loanService.isLoadingLoans;
+  }
+  get isLoadingClients() {
+    return this.loanService.isLoadingClients;
   }
 
   updateSearch(value: string) {
-    this.search.set(value);
+    this.loanService.updateSearch(value);
   }
 
   filterLoans() {
-    this.search.set(this.search());
+    this.loanService.search.set(this.loanService.search());
   }
 
   openAddModal() {
     this.showAddModal.set(true);
-    this.createLoanForm.reset();
+    this.loanService.createLoanForm.reset();
   }
 
   toggleDropdownMonth() {
@@ -183,33 +116,36 @@ export class LoansComponent {
   }
 
   displayMonth = computed(() =>
-    this.selectedMonth()
-      ? this.months.find((m) => m.value === this.selectedMonth())?.label ??
-        'Mês'
+    this.loanService.selectedMonth()
+      ? this.loanService.months.find(
+          (m) => m.value === this.loanService.selectedMonth()
+        )?.label ?? 'Mês'
       : 'Mês'
   );
 
-  displayYear = computed(() => this.selectedYear().toString() ?? 'Ano');
+  displayYear = computed(
+    () => this.loanService.selectedYear().toString() ?? 'Ano'
+  );
 
   yearOptions = computed(() =>
-    this.years.map((y) => ({ value: y, label: y.toString() }))
+    this.loanService.years.map((y) => ({ value: y, label: y.toString() }))
   );
 
   onSelectMonth(value: number) {
-    this.selectedMonth.set(value);
+    this.loanService.selectedMonth.set(value);
     this.filterLoans();
     this.showDropdownMonthOpen.set(false);
   }
 
   onSelectYear(value: number) {
-    this.selectedYear.set(value);
+    this.loanService.selectedYear.set(value);
     this.filterLoans();
     this.showDropdownYearOpen.set(false);
   }
 
   openEditModal(loan: Loan) {
     this.selectedLoan = loan;
-    this.editLoanForm.patchValue({
+    this.loanService.editLoanForm.patchValue({
       bookId: loan.bookId,
       clientId: loan.clientId,
       loanDate: this.formatDateOutput(loan.loanDate),
@@ -257,257 +193,83 @@ export class LoansComponent {
 
   onCreateLoanDateInput(value: string) {
     const formatted = this.formatDateInput(value);
-    this.createLoanForm
+    this.loanService.createLoanForm
       .get('loanDate')
       ?.setValue(formatted, { emitEvent: false });
   }
 
   onCreateReturnDateInput(value: string) {
     const formatted = this.formatDateInput(value);
-    this.createLoanForm
+    this.loanService.createLoanForm
       .get('returnDate')
       ?.setValue(formatted, { emitEvent: false });
   }
 
   onEditLoanDateInput(value: string) {
     const formatted = this.formatDateInput(value);
-    this.editLoanForm
+    this.loanService.editLoanForm
       .get('loanDate')
       ?.setValue(formatted, { emitEvent: false });
   }
 
   onEditReturnDateInput(value: string) {
     const formatted = this.formatDateInput(value);
-    this.editLoanForm
+    this.loanService.editLoanForm
       .get('returnDate')
       ?.setValue(formatted, { emitEvent: false });
   }
 
   onEditReturnDateAtInput(value: string) {
     const formatted = this.formatDateInput(value);
-    this.editLoanForm
+    this.loanService.editLoanForm
       .get('returnedAt')
       ?.setValue(formatted, { emitEvent: false });
   }
 
-  parseDateString(dateStr: string): Date | null {
-    const parts = dateStr.split('/');
-    if (parts.length !== 3) return null;
-
-    const day = Number(parts[0]);
-    const month = Number(parts[1]) - 1;
-    const year = Number(parts[2]);
-
-    const date = new Date(year, month, day);
-
-    if (
-      date.getFullYear() === year &&
-      date.getMonth() === month &&
-      date.getDate() === day
-    ) {
-      return date;
-    }
-    return null;
-  }
-
   saveLoan() {
-    if (this.createLoanForm.invalid) return;
+    this.isCreating.set(true);
 
-    const token = localStorage.getItem('auth-token');
-    if (!token) return;
-
-    this.isCreating = true;
-
-    const loanDate = this.parseDateString(this.createLoanForm.value.loanDate!);
-    const returnDate = this.parseDateString(
-      this.createLoanForm.value.returnDate!
+    this.loanService.createLoan(
+      () => {
+        this.closeModal();
+        this.isCreating.set(false);
+      },
+      () => {
+        this.isCreating.set(false);
+      }
     );
-
-    if (!loanDate || !returnDate) {
-      this.toastService.error('Datas inválidas. Use o formato dd/mm/aaaa.');
-      return;
-    }
-
-    this.dashboardService
-      .createLoan(
-        {
-          bookId: this.createLoanForm.value.bookId!,
-          clientId: this.createLoanForm.value.clientId!,
-          loanDate: loanDate.toISOString(),
-          returnDate: returnDate.toISOString(),
-        },
-        token
-      )
-      .subscribe({
-        next: (createdLoan: Loan) => {
-          this.toastService.success('Empréstimo criado com sucesso!');
-          this.loans.update((loans) => [...loans, createdLoan]);
-          this.closeModal();
-        },
-        error: (err) => {
-          this.toastService.error('Erro ao criar empréstimo');
-          this.isCreating = false;
-          this.closeModal();
-        },
-        complete: () => {
-          this.isCreating = false;
-        },
-      });
   }
 
   updateLoan() {
-    if (this.editLoanForm.invalid || !this.selectedLoan) return;
+    if (!this.selectedLoan) return;
 
-    const token = localStorage.getItem('auth-token');
-    if (!token) return;
+    this.isEditing.set(true);
 
-    this.isEditing = true;
-
-    const loanDateValue = this.editLoanForm.value.loanDate;
-    const returnDateValue = this.editLoanForm.value.returnDate;
-    const returnedAtValue = this.editLoanForm.value.returnedAt;
-
-    if (!loanDateValue || !returnDateValue) {
-      this.toastService.error(
-        'Datas de empréstimo e retorno não podem estar vazias.'
-      );
-      return;
-    }
-
-    const loanDate = this.parseDateString(loanDateValue);
-    const returnDate = this.parseDateString(returnDateValue);
-    const returnedAt = returnedAtValue
-      ? this.parseDateString(returnedAtValue)
-      : null;
-
-    if (!loanDate || !returnDate || (returnedAtValue && !returnedAt)) {
-      this.toastService.error('Datas inválidas. Use o formato dd/mm/aaaa.');
-      return;
-    }
-
-    this.dashboardService
-      .editLoan(
-        this.selectedLoan.id,
-        {
-          bookId: this.editLoanForm.value.bookId!,
-          clientId: this.editLoanForm.value.clientId!,
-          LoanDate: loanDate.toISOString(),
-          returnDate: returnDate.toISOString(),
-          returnedAt: returnedAt ? returnedAt.toISOString() : undefined,
-        },
-        token
-      )
-      .subscribe({
-        next: (updatedLoan: Loan) => {
-          this.toastService.success('Empréstimo editado com sucesso!');
-          this.loans.update((loans) =>
-            loans.map((loan) =>
-              loan.id === updatedLoan.id ? updatedLoan : loan
-            )
-          );
-          this.closeModal();
-        },
-        error: (err) => {
-          this.toastService.error('Erro ao editar empréstimo');
-          this.isEditing = false;
-          this.closeModal();
-        },
-        complete: () => {
-          this.isEditing = false;
-        },
-      });
+    this.loanService.updateLoan(
+      this.selectedLoan,
+      () => {
+        this.closeModal();
+        this.isEditing.set(false);
+      },
+      () => {
+        this.isEditing.set(false);
+      }
+    );
   }
 
   confirmDelete() {
     if (!this.selectedLoan) return;
 
-    const token = localStorage.getItem('auth-token');
-    if (!token) return;
-
-    this.isDeleting = true;
-
-    this.dashboardService.deleteLoan(this.selectedLoan.id, token).subscribe({
-      next: () => {
-        this.toastService.success('Empréstimo deletado com sucesso!');
-        this.loans.update((loans) =>
-          loans.filter((loan) => loan.id !== this.selectedLoan!.id)
-        );
+    this.isDeleting.set(true);
+    this.loanService.deleteLoan(
+      this.selectedLoan.id,
+      () => {
         this.closeModal();
+        this.isDeleting.set(false);
       },
-      error: (err) => {
-        this.toastService.error('Erro ao deletar empréstimo');
-        this.isDeleting = false;
-        this.closeModal();
-      },
-      complete: () => {
-        this.isDeleting = false;
-      },
-    });
-  }
-
-  loadBooks() {
-    const token = localStorage.getItem('auth-token');
-
-    if (!token) return;
-
-    this.isLoadingBooks.set(true);
-
-    this.dashboardService.getAllBooks(token).subscribe({
-      next: (res: any) => {
-        const booksFromApi = res as Book[];
-        this.books.set(booksFromApi);
-      },
-      error: (err) => {
-        this.toastService.error('Erro ao buscar livros');
-        this.isLoadingBooks.set(false);
-      },
-      complete: () => {
-        this.isLoadingBooks.set(false);
-      },
-    });
-  }
-
-  loadClients() {
-    const token = localStorage.getItem('auth-token');
-
-    if (!token) return;
-
-    this.isLoadingClients.set(true);
-
-    this.dashboardService.getAllClients(token).subscribe({
-      next: (res: any) => {
-        const clientsFromApi = res as Client[];
-        this.clients.set(clientsFromApi);
-      },
-      error: (err) => {
-        this.toastService.error('Erro ao buscar clientes');
-        this.isLoadingClients.set(false);
-      },
-      complete: () => {
-        this.isLoadingClients.set(false);
-      },
-    });
-  }
-
-  loadLoans() {
-    const token = localStorage.getItem('auth-token');
-
-    if (!token) return;
-
-    this.isLoadingLoans.set(true);
-
-    this.dashboardService.getAllLoans(token).subscribe({
-      next: (res: any) => {
-        const loansFromApi = res as Loan[];
-        this.loans.set(loansFromApi);
-      },
-      error: (err) => {
-        this.toastService.error('Erro ao buscar empréstimos');
-        this.isLoadingLoans.set(false);
-      },
-      complete: () => {
-        this.isLoadingLoans.set(false);
-      },
-    });
+      () => {
+        this.isDeleting.set(false);
+      }
+    );
   }
 }

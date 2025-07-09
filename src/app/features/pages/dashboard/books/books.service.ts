@@ -130,7 +130,7 @@ export class BooksService {
     });
   }
 
-  deleteBook(userId: number, onSuccess: () => void, onError: () => void) {
+  deleteBook(bookId: number, onSuccess: () => void, onError: () => void) {
     if (!this.selectedBook) return;
 
     const token = localStorage.getItem('auth-token');

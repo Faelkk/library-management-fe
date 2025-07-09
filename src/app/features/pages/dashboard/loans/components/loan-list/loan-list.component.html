@@ -1,0 +1,94 @@
+<section class="flex flex-col w-full flex-1">
+  <header
+    class="flex flex-col gap-2 xl:flex-row justify-between w-full xl:items-center mt-10"
+  >
+    <h2 class="font-poppins text-gray-800 font-medium">
+      Lista de todos os empréstimos
+    </h2>
+
+    <div
+      class="flex flex-col md:flex-row gap-4 justify-between items-center xl:max-w-[40rem] w-full"
+    >
+      <div class="flex flex-col relative w-full md:w-auto">
+        <button
+          (click)="onToggleDropdownMonth()"
+          class="flex items-center gap-3 input-content border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full smd:w-auto justify-between transition"
+        >
+          {{ displayMonth() }}
+          <img
+            src="assets/icons/arrow-down.svg"
+            class="transition-transform"
+            [class.rotate-180]="showDropdownMonthOpen()"
+          />
+        </button>
+
+        <app-dropdown
+          [showDropdown]="showDropdownMonthOpen()"
+          [options]="loanService.months"
+          [selectedValue]="loanService.selectedMonth()"
+          (select)="onSelectMonth($event)"
+          (close)="onToggleDropdownMonth()"
+        ></app-dropdown>
+      </div>
+      <div class="flex flex-col relative w-full md:w-auto">
+        <button
+          (click)="onToggleDropdownYear()"
+          class="flex items-center gap-3 input-content border border-gray-300 rounded-lg bg-white p-3 text-gray-800 w-full smd:w-auto justify-between transition"
+        >
+          {{ displayYear() }}
+          <img
+            src="assets/icons/arrow-down.svg"
+            class="transition-transform"
+            [class.rotate-180]="showDropdownYearOpen()"
+          />
+        </button>
+
+        <app-dropdown
+          [showDropdown]="showDropdownYearOpen()"
+          [options]="yearOptions()"
+          [selectedValue]="loanService.selectedYear()"
+          (select)="onSelectYear($event)"
+          (close)="onToggleDropdownYear()"
+        ></app-dropdown>
+      </div>
+      <app-input
+        placeholder="Procure por cliente ou livro"
+        class="flex-1 w-full"
+        (valueChange)="onUpdateSearch($event)"
+      >
+        <img src="assets/icons/search.svg" alt="Buscar" class="w-5 h-5" />
+      </app-input>
+    </div>
+  </header>
+
+  <div class="mt-10 flex flex-wrap gap-5 max-h-[32rem] overflow-auto">
+    @if (isLoadingLoans) {
+    <div class="w-full flex justify-center items-center py-10">
+      <app-spinner />
+    </div>
+    } @else if (loans.length > 0) { @for (loan of loans; track loan.id) {
+    <app-loan-card
+      [id]="loan.id"
+      [name]="loanService.getBookName(loan.bookId)"
+      [description]="
+        'Emprestado para ' + loanService.getUserName(loan.clientId)
+      "
+      [loanDate]="loan.loanDate"
+      [expectedDate]="loan.returnDate"
+      [returnedAt]="loan.returnedAt"
+      class="w-full lg:w-auto"
+      (edit)="onEdit(loan)"
+      (delete)="onDelete(loan)"
+    >
+    </app-loan-card>
+    } } @else {
+    <p class="text-gray-600 font-sans">Nenhum empréstimo encontrado.</p>
+    }
+  </div>
+
+  <div class="w-full flex justify-end mt-5">
+    <app-button (click)="onAddLoan()" className="bg-teal-900 block">
+      <img src="assets/icons/add.svg" />
+    </app-button>
+  </div>
+</section>
