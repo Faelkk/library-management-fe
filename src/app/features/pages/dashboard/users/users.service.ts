@@ -2,12 +2,12 @@ import { Injectable, signal, computed } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { User } from './users/users.component';
-import { DashboardServiceService } from './services/dashboard-service.service';
+import { User } from './users.component';
+import { DashboardServiceService } from '../services/dashboard-service.service';
 import {
   CreateUserPayload,
   EditUserPayload,
-} from '../../../shared/types/dashboard/dashboard-type';
+} from '../../../../shared/types/dashboard/dashboard-type';
 
 @Injectable({
   providedIn: 'root',

@@ -1,0 +1,38 @@
+<app-modal [show]="show" (close)="onClose()" title="Adicionar cliente">
+  <form [formGroup]="form" (submit)="onSubmit()" class="md:min-w-[35rem]">
+    <div class="flex flex-col gap-3">
+      <app-input
+        label="Nome do cliente"
+        placeholder="Ex: João Silva"
+        formControlName="name"
+      ></app-input>
+
+      <app-input
+        label="Email"
+        placeholder="Ex: joao@email.com"
+        formControlName="email"
+        type="email"
+      ></app-input>
+
+      <app-input
+        label="Telefone"
+        placeholder="Ex: (11) 99999-9999"
+        formControlName="phoneNumber"
+        inputName="phoneNumber"
+        [maxlength]="15"
+        (valueChange)="form.get('phoneNumber')?.setValue($event)"
+      ></app-input>
+    </div>
+
+    <div class="flex justify-end gap-2 mt-4 w-full">
+      <app-button
+        class="w-full flex"
+        [className]="!form.invalid ? 'bg-teal-900 text-white rounded-2xl' : ''"
+        [disabled]="form.invalid || isLoading"
+        [isLoading]="isLoading"
+      >
+        Salvar
+      </app-button>
+    </div>
+  </form>
+</app-modal>

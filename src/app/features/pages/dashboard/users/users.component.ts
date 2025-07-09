@@ -7,7 +7,7 @@ import { UsersHeaderComponent } from './components/users-header/users-header.com
 import { UserCreateModalComponent } from './components/user-create-modal/user-create-modal.component';
 import { UserEditModalComponent } from './components/user-edit-modal/user-edit-modal.component';
 import { UserDeleteModalComponent } from './components/user-delete-modal/user-delete-modal.component';
-import { UsersService } from '../users.service';
+import { UsersService } from './users.service';
 
 export interface User {
   id: number;

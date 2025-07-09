@@ -43,3 +43,15 @@ export interface Loan {
   returnDate: Date;
   returnedAt?: Date | null;
 }
+
+export interface CreateClientPayload {
+  name: string;
+  email: string;
+  phoneNumber: string;
+}
+
+export interface EditClientPayload {
+  name: string;
+  email: string;
+  phoneNumber: string;
+}

@@ -1,18 +1,12 @@
-import { Component, computed, Inject, signal } from '@angular/core';
-import {
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { DashboardServiceService } from '../services/dashboard-service.service';
+import { Component, signal } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { DashboardLayoutComponent } from '../components/dashboard-layout/dashboard-layout.component';
-import { InputComponent } from '../components/input/input.component';
-import { ClientCardComponent } from './components/clients/client-card/client-card.component';
-import { ButtonComponent } from '../components/button/button.component';
-import { ModalComponent } from '../components/modal/modal.component';
-import { ToastrService } from 'ngx-toastr';
-import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
+import { ClientsService } from './clients.service';
+import { ClientsHeaderComponent } from './components/clients-header/clients-header.component';
+import { ClientsListComponent } from './components/clients-list/clients-list.component';
+import { ClientCreateModalComponent } from './components/client-create-modal/client-create-modal.component';
+import { ClientEditModalComponent } from './components/client-edit-modal/client-edit-modal.component';
+import { ClientsDeleteModalComponent } from './components/clients-delete-modal/clients-delete-modal.component';
 
 export interface Client {
   id: number;
@@ -25,79 +19,53 @@ export interface Client {
   selector: 'app-clients',
   imports: [
     DashboardLayoutComponent,
-    ClientCardComponent,
-    InputComponent,
-    ButtonComponent,
-    ModalComponent,
     ReactiveFormsModule,
-    SpinnerComponent,
+    ClientsHeaderComponent,
+    ClientsListComponent,
+    ClientCreateModalComponent,
+    ClientEditModalComponent,
+    ClientsDeleteModalComponent,
   ],
   templateUrl: './clients.component.html',
   styleUrl: './clients.component.css',
 })
 export class ClientsComponent {
-  constructor(
-    private dashboardService: DashboardServiceService,
-    private toastService: ToastrService
-  ) {
-    this.loadClients();
+  constructor(public clientService: ClientsService) {
+    this.clientService.loadClients();
   }
-  clients = signal<Client[]>([]);
+
+  get clients() {
+    return this.clientService.clients;
+  }
+
+  get filteredClients() {
+    return this.clientService.filteredClients;
+  }
+
+  get isLoadingClients() {
+    return this.clientService.isLoadingClients;
+  }
 
   showAddModal = signal(false);
   showEditModal = signal(false);
   showDeleteModal = signal(false);
   selectedClient: Client | null = null;
-  isCreating: boolean = false;
-  isEditing: boolean = false;
-  isDeleting: boolean = false;
-  isLoadingClients = signal<boolean>(false);
-
-  search = signal<string>('');
-
-  createForm = new FormGroup({
-    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
-    email: new FormControl('', [Validators.required, Validators.email]),
-    phoneNumber: new FormControl('', [
-      Validators.required,
-      Validators.pattern(/^\(?\d{2}\)?\s?\d{4,5}\-?\d{4}$/),
-    ]),
-  });
-
-  editForm = new FormGroup({
-    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
-    email: new FormControl('', [Validators.required, Validators.email]),
-    phoneNumber: new FormControl('', [
-      Validators.required,
-      Validators.pattern(/^\(?\d{2}\)?\s?\d{4,5}\-?\d{4}$/),
-    ]),
-  });
-
-  filteredClients = computed(() => {
-    const term = this.search().toLowerCase().trim();
-    if (!term) return this.clients();
-
-    return this.clients().filter(
-      (client) =>
-        client.id.toString().includes(term) ||
-        client.name.toLowerCase().includes(term) ||
-        client.email.toLowerCase().includes(term) ||
-        client.phoneNumber.includes(term)
-    );
-  });
+  isCreating = signal(false);
+  isEditing = signal(false);
+  isDeleting = signal(false);
 
   updateSearch(value: string) {
-    this.search.set(value);
+    this.clientService.updateSearch(value);
   }
 
   openModal() {
     this.showAddModal.set(true);
-    this.createForm.reset();
+    this.clientService.createForm.reset();
   }
 
   openEditModal(client: Client) {
     this.selectedClient = client;
-    this.editForm.patchValue(client);
+    this.clientService.editForm.patchValue(client);
     this.showEditModal.set(true);
   }
 
@@ -114,131 +82,49 @@ export class ClientsComponent {
   }
 
   saveClient() {
-    if (this.createForm.invalid) return;
+    this.isCreating.set(true);
 
-    const token = localStorage.getItem('auth-token');
-    if (!token) return;
-
-    this.isCreating = true;
-
-    const payload = {
-      name: this.createForm.value.name!,
-      email: this.createForm.value.email!,
-      phoneNumber: this.createForm.value.phoneNumber!,
-    };
-
-    this.dashboardService.createClient(payload, token).subscribe({
-      next: (newClient: Client) => {
-        this.toastService.success('cliente criado com sucesso');
-        this.clients.update((clients) => [...clients, newClient]);
+    this.clientService.createClient(
+      () => {
         this.closeModal();
+        this.isCreating.set(false);
       },
-      error: (err) => {
-        this.toastService.error('Erro ao editar cliente');
-        this.isCreating = false;
-        this.closeModal();
-      },
-      complete: () => {
-        this.isCreating = false;
-      },
-    });
+      () => {
+        this.isCreating.set(false);
+      }
+    );
   }
 
   updateClient() {
-    if (this.editForm.invalid || !this.selectedClient) return;
+    if (!this.selectedClient) return;
 
-    const token = localStorage.getItem('auth-token');
-    if (!token) return;
+    this.isEditing.set(true);
 
-    this.isEditing = false;
-
-    const payload = {
-      name: this.editForm.value.name!,
-      email: this.editForm.value.email!,
-      phoneNumber: this.editForm.value.phoneNumber!,
-    };
-
-    const hasChanged =
-      payload.name !== this.selectedClient.name ||
-      payload.email !== this.selectedClient.email ||
-      payload.phoneNumber !== this.selectedClient.phoneNumber;
-
-    if (!hasChanged) {
-      this.closeModal();
-      return;
-    }
-
-    this.dashboardService
-      .editClient(this.selectedClient.id, payload, token)
-      .subscribe({
-        next: (updateClient) => {
-          this.toastService.success('cliente editado com sucesso');
-          this.clients.update((clients) =>
-            clients.map((client) =>
-              client.id === updateClient.id ? updateClient : client
-            )
-          );
-          this.closeModal();
-        },
-        error: (err) => {
-          this.toastService.error('Erro ao editar cliente');
-          this.isEditing = false;
-          this.closeModal();
-        },
-        complete: () => {
-          this.isEditing = false;
-        },
-      });
+    this.clientService.updateClient(
+      this.selectedClient,
+      () => {
+        this.closeModal();
+        this.isEditing.set(false);
+      },
+      () => {
+        this.isEditing.set(false);
+      }
+    );
   }
 
   confirmDelete() {
     if (!this.selectedClient) return;
 
-    const token = localStorage.getItem('auth-token');
-    if (!token) return;
-
-    this.isDeleting = true;
-
-    this.dashboardService
-      .deleteClient(this.selectedClient.id, token)
-      .subscribe({
-        next: () => {
-          this.toastService.success('cliente deletado com sucesso');
-          this.clients.update((clients) =>
-            clients.filter((c) => c.id !== this.selectedClient?.id)
-          );
-          this.closeModal();
-        },
-
-        error: (err) => {
-          this.toastService.error('Erro ao deletar cliente');
-          this.isDeleting = false;
-          this.closeModal();
-        },
-        complete: () => {
-          this.isDeleting = false;
-        },
-      });
-  }
-
-  loadClients() {
-    const token = localStorage.getItem('auth-token');
-    if (!token) return;
-
-    this.isLoadingClients.set(true);
-
-    this.dashboardService.getAllClients(token).subscribe({
-      next: (res: any) => {
-        const clientsFromApi = res as Client[];
-        this.clients.set(clientsFromApi);
+    this.isDeleting.set(true);
+    this.clientService.deleteClient(
+      this.selectedClient.id,
+      () => {
+        this.closeModal();
+        this.isDeleting.set(false);
       },
-      error: (err) => {
-        this.toastService.error('Erro ao buscar clientes');
-        this.isLoadingClients.set(false);
-      },
-      complete: () => {
-        this.isLoadingClients.set(false);
-      },
-    });
+      () => {
+        this.isDeleting.set(false);
+      }
+    );
   }
 }

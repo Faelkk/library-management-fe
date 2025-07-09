@@ -1,0 +1,42 @@
+<section class="flex flex-col w-full flex-1">
+  <header
+    class="flex flex-col gap-2 md:flex-row justify-between w-full md:items-center mt-10"
+  >
+    <h2 class="font-poppins text-gray-800 font-medium">Lista de clientes</h2>
+
+    <app-input
+      placeholder="Procure um cliente"
+      class="w-full md:max-w-[18.75rem] lg:max-w-[27.5rem]"
+      (valueChange)="onSearchChange($event)"
+    >
+      <img src="assets/icons/search.svg" alt="Search" class="w-5 h-5" />
+    </app-input>
+  </header>
+
+  <div class="mt-10 flex flex-wrap gap-5 max-h-[32rem] overflow-auto">
+    @if (isLoading) {
+    <div class="w-full flex justify-center items-center py-10">
+      <app-spinner />
+    </div>
+    } @else if (clients.length > 0) { @for (client of clients; track client.id)
+    {
+    <app-client-card
+      [name]="client.name"
+      [id]="client.id"
+      [email]="client.email"
+      [phoneNumber]="client.phoneNumber"
+      class="w-full lg:w-auto"
+      (edit)="onEdit(client)"
+      (delete)="onDelete(client)"
+    ></app-client-card>
+    } } @else {
+    <p class="text-gray-600 font-sans">Nenhum cliente encontrado.</p>
+    }
+  </div>
+
+  <div class="w-full flex justify-end mt-5">
+    <app-button (click)="onAddClient()" className="bg-teal-900">
+      <img src="assets/icons/add.svg" />
+    </app-button>
+  </div>
+</section>

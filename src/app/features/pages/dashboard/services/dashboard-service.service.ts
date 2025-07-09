@@ -59,7 +59,7 @@ export class DashboardServiceService {
   }
 
   getAllClients(token: string) {
-    return this.httpClient.get('/client', {
+    return this.httpClient.get<Client[]>('/client', {
       headers: { Authorization: `Bearer ${token}` },
     });
   }

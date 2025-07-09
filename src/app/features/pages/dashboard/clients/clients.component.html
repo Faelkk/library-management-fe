@@ -1,180 +1,38 @@
 <app-dashboard-layout>
   <section class="p-3 w-full h-full lg:max-h-screen">
-    <header class="flex gap-4 flex-col md:flex-row justify-between w-full">
-      <section class="flex flex-col gap-2">
-        <h1 class="font-poppins text-2xl text-gray-900 font-bold">Clientes</h1>
-        <span class="font-sans text-gray-700"> Monitore os clientes </span>
-      </section>
+    <app-clients-header [totalClients]="clients().length" />
 
-      <section
-        class="flex flex-col bg-white drop-shadow-sm py-3 px-5 rounded-md gap-2"
-      >
-        <span class="font-poppins text-gray-700 text-sm">
-          Número total de clientes:
-        </span>
-        <span class="font-sans text-gray-900 font-bold">
-          {{ clients().length }}
-        </span>
-      </section>
-    </header>
-
-    <section class="flex flex-col w-full flex-1">
-      <header
-        class="flex flex-col gap-2 md:flex-row justify-between w-full md:items-center mt-10"
-      >
-        <h2 class="font-poppins text-gray-800 font-medium">
-          Lista de clientes
-        </h2>
-
-        <app-input
-          placeholder="Procure um cliente"
-          class="w-full md:max-w-[18.75rem] lg:max-w-[27.5rem]"
-          (valueChange)="updateSearch($event)"
-        >
-          <img src="assets/icons/search.svg" alt="Search" class="w-5 h-5" />
-        </app-input>
-      </header>
-
-      <div class="mt-10 flex flex-wrap gap-5 max-h-[32rem] overflow-auto">
-        @if (isLoadingClients()) {
-        <div class="w-full flex justify-center items-center py-10">
-          <app-spinner />
-        </div>
-        } @else if (filteredClients().length > 0) { @for (client of
-        filteredClients(); track client.id) {
-        <app-client-card
-          [name]="client.name"
-          [id]="client.id"
-          [email]="client.email"
-          [phoneNumber]="client.phoneNumber"
-          class="w-full lg:w-auto"
-          (edit)="openEditModal(client)"
-          (delete)="openDeleteModal(client)"
-        ></app-client-card>
-        } } @else {
-        <p class="text-gray-600 font-sans">Nenhum cliente encontrado.</p>
-        }
-      </div>
-
-      <div class="w-full flex justify-end mt-5">
-        <app-button (click)="openModal()" className="bg-teal-900">
-          <img src="assets/icons/add.svg" />
-        </app-button>
-      </div>
-    </section>
+    <app-clients-list
+      [clients]="filteredClients()"
+      [isLoading]="isLoadingClients()"
+      (searchChange)="updateSearch($event)"
+      (editUser)="openEditModal($event)"
+      (deleteUser)="openDeleteModal($event)"
+      (addUser)="openModal()"
+    />
   </section>
 </app-dashboard-layout>
 
-<app-modal
+<app-client-create-modal
   [show]="showAddModal()"
   (close)="closeModal()"
-  title="Adicionar cliente"
->
-  <form
-    [formGroup]="createForm"
-    (submit)="saveClient()"
-    class="md:min-w-[35rem]"
-  >
-    <div class="flex flex-col gap-3">
-      <app-input
-        label="Nome do cliente"
-        placeholder="Ex: João Silva"
-        formControlName="name"
-      ></app-input>
+  [form]="clientService.createForm"
+  (save)="saveClient()"
+  [isLoading]="isCreating()"
+/>
 
-      <app-input
-        label="Email"
-        placeholder="Ex: joao@email.com"
-        formControlName="email"
-        type="email"
-      ></app-input>
-
-      <app-input
-        label="Telefone"
-        placeholder="Ex: (11) 99999-9999"
-        formControlName="phoneNumber"
-        inputName="phoneNumber"
-        [maxlength]="15"
-        (valueChange)="createForm.get('phoneNumber')?.setValue($event)"
-      ></app-input>
-    </div>
-
-    <div class="flex justify-end gap-2 mt-4 w-full">
-      <app-button
-        class="w-full flex"
-        [className]="
-          !createForm.invalid ? 'bg-teal-900 text-white rounded-2xl' : ''
-        "
-        [disabled]="createForm.invalid || isCreating"
-        [isLoading]="isCreating"
-      >
-        Salvar
-      </app-button>
-    </div>
-  </form>
-</app-modal>
-
-<app-modal
+<app-client-edit-modal
   [show]="showEditModal()"
   (close)="closeModal()"
-  title="Editar Cliente"
->
-  <form [formGroup]="editForm" (submit)="updateClient()">
-    <div class="flex flex-col gap-3">
-      <app-input
-        label="Nome do Cliente"
-        placeholder="Ex: João Silva"
-        formControlName="name"
-      ></app-input>
+  [form]="clientService.editForm"
+  (update)="updateClient()"
+  [isLoading]="isEditing()"
+/>
 
-      <app-input
-        label="Email"
-        placeholder="Ex: joao@email.com"
-        formControlName="email"
-        type="email"
-      ></app-input>
-
-      <app-input
-        label="Telefone"
-        placeholder="Ex: (11) 99999-9999"
-        formControlName="phoneNumber"
-        inputName="phoneNumber"
-        [maxlength]="15"
-        (valueChange)="editForm.get('phoneNumber')?.setValue($event)"
-      ></app-input>
-    </div>
-
-    <div class="flex justify-end gap-2 mt-4 w-full">
-      <app-button
-        class="bg-teal-900 text-white rounded-2xl w-full"
-        [disabled]="editForm.invalid || isEditing"
-        [isLoading]="isEditing"
-      >
-        Atualizar
-      </app-button>
-    </div>
-  </form>
-</app-modal>
-
-<app-modal
+<app-clients-delete-modal
   [show]="showDeleteModal()"
   (close)="closeModal()"
-  title="Excluir Cliente"
->
-  <p class="mb-4 mt-10 max-w-80">
-    Tem certeza que deseja excluir o cliente
-    <strong>{{ selectedClient?.name }}</strong
-    >?
-  </p>
-
-  <div class="flex justify-end gap-2 mt-10 w-full">
-    <app-button
-      class="border-red-700 text-red-700 border rounded-2xl w-full"
-      [disabled]="isDeleting"
-      [isLoading]="isDeleting"
-      (onClick)="confirmDelete()"
-    >
-      Confirmar
-    </app-button>
-  </div>
-</app-modal>
+  [client]="selectedClient"
+  (confirmDelete)="confirmDelete()"
+  [isLoading]="isDeleting()"
+/>
