@@ -1,59 +1,77 @@
-# LibraryManagementFe
+# 📖 Library Management - Front-end
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.15.
+Este é o front-end do sistema **Library Management**, desenvolvido para atender à demanda da biblioteca da escola onde atuo como estagiário administrativo. O sistema facilita a gestão de livros didáticos e literários, otimizando os processos de empréstimo, devolução e organização do acervo, além do gerenciamento de usuários.
 
-## Development server
+A interface foi construída pensando na **usabilidade**, **acessibilidade** e **responsividade**, garantindo uma experiência intuitiva para alunos, professores e administradores.
 
-To start a local development server, run:
+---
 
-```bash
-ng serve
-```
+## ✅ Funcionalidades
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- 👥 Autenticação e controle de acesso com base em papéis (admin/usuário).
+- 📚 Cadastro, edição e remoção de livros e gêneros literários.
+- 🔍 Pesquisa e visualização de livros disponíveis na biblioteca.
+- 🔄 Controle visual de empréstimos e devoluções.
+- ⚙️ Interface responsiva para uso em dispositivos móveis e desktops.
+- 🧩 Integração total com a API REST do back-end via HTTPClient.
 
-## Code scaffolding
+---
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 🎨 Tecnologias Utilizadas
 
-```bash
-ng generate component component-name
-```
+- [Angular 19](https://angular.io/)
+- [Angular Signals](https://angular.dev/features/reactivity)
+- [RxJS](https://rxjs.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [Angular Forms (Reactive Forms)](https://angular.io/guide/reactive-forms)
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
+## 🧱 Estrutura do Projeto
 
-## Building
+O front-end é baseado na arquitetura de componentes , utilizando standalone components do Angular 15.
 
-To build the project run:
+- `features/`: componentes de páginas e funcionalidades (ex: clients, books, loans)
+- `shared/`: componentes reutilizáveis (modais, inputs, botões, etc)
+- `core/`: serviços, guards, interceptors e configurações globais
+- `styles/`: configurações globais de Tailwind e temas
 
-```bash
-ng build
-```
+---
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## 🔐 Segurança
 
-## Running unit tests
+- Autenticação via JWT, com interceptação automática de tokens nas requisições.
+- Proteção de rotas com guards (`AuthGuard`, `RoleGuard`).
+- Validações reativas nos formulários para garantir integridade dos dados.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+---
 
-```bash
-ng test
-```
+## 🚀 Como Rodar o Projeto
 
-## Running end-to-end tests
+1.  **Clone o Repositório:**
 
-For end-to-end (e2e) testing, run:
+    ```bash
+    git clone https://github.com/Faelkk/management-library-fe
+    ```
 
-```bash
-ng e2e
-```
+2.  **Instalar as Dependências**
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+    ```bash
+    npm install
+    ```
 
-## Additional Resources
+3.  **Rodar o Projeto**
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+    ```bash
+    npm run start
+    ```
+
+🤝 **Como Contribuir?**
+
+- ⭐ Deixe uma estrela no repositório.
+- 🔗 Me siga aqui no GitHub.
+- 👥 Conecte-se comigo no LinkedIn e faça parte da minha rede profissional.
+
+👨‍💻**Autor**
+Desenvolvido por [Rafael Achtenberg](linkedin.com/in/rafael-achtenberg-7a4b12284/).

@@ -31,12 +31,7 @@ interface Genre {
   imports: [
     DashboardLayoutComponent,
     DashboardLayoutComponent,
-    InputComponent,
-    ButtonComponent,
-    ModalComponent,
     ReactiveFormsModule,
-    GenresCardComponent,
-    SpinnerComponent,
     GenreHeaderComponent,
     GenreListComponent,
     GenreCreateModalComponent,

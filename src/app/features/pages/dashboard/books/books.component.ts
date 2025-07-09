@@ -1,11 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, Inject, signal } from '@angular/core';
 import { DashboardLayoutComponent } from '../components/dashboard-layout/dashboard-layout.component';
-import { InputComponent } from '../components/input/input.component';
-import { ButtonComponent } from '../components/button/button.component';
-import { ModalComponent } from '../components/modal/modal.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { BookByCardComponent } from './components/book-by-card/book-by-card.component';
-import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 import { BooksService } from './books.service';
 import { BooksHeaderComponent } from './components/books-header/books-header.component';
 import { BooksListComponent } from './components/books-list/books-list.component';
@@ -25,6 +20,7 @@ export interface Book {
   GenreIds: number[];
 }
 
+@Inject(BooksService)
 @Component({
   selector: 'app-books',
   imports: [

@@ -4,6 +4,7 @@ import { ButtonComponent } from '../../../components/button/button.component';
 import { SpinnerComponent } from '../../../../../../shared/components/spinner/spinner.component';
 import { ModalComponent } from '../../../components/modal/modal.component';
 import { Genre } from '../../../../../../shared/types/dashboard/dashboard-type';
+import { InputComponent } from '../../../components/input/input.component';
 
 @Component({
   selector: 'app-books-edit-modal',
@@ -12,6 +13,7 @@ import { Genre } from '../../../../../../shared/types/dashboard/dashboard-type';
     ButtonComponent,
     SpinnerComponent,
     ModalComponent,
+    InputComponent,
   ],
   templateUrl: './books-edit-modal.component.html',
   styleUrl: './books-edit-modal.component.css',

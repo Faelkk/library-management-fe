@@ -1,7 +1,7 @@
 <app-modal [show]="show" (close)="onClose()" title="Editar Livro">
   <form
     [formGroup]="form"
-    (submit)="(onSubmit)"
+    (submit)="onSubmit()"
     class="md:min-w-[35rem] w-full"
   >
     <div class="flex flex-col gap-3">
@@ -44,7 +44,7 @@
             name="imageFileEdit"
             type="file"
             accept="image/*"
-            (change)="(onSelect)"
+            (change)="onSelect()"
             class="flex-1 peer focus:outline-none font-sans placeholder:text-gray-500 text-gray-500 max-w-full"
           />
         </div>

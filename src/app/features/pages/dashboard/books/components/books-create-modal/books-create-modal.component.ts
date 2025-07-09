@@ -4,6 +4,7 @@ import { ModalComponent } from '../../../components/modal/modal.component';
 import { SpinnerComponent } from '../../../../../../shared/components/spinner/spinner.component';
 import { ButtonComponent } from '../../../components/button/button.component';
 import { Genre } from '../../../../../../shared/types/dashboard/dashboard-type';
+import { InputComponent } from '../../../components/input/input.component';
 
 @Component({
   selector: 'app-books-create-modal',
@@ -12,6 +13,7 @@ import { Genre } from '../../../../../../shared/types/dashboard/dashboard-type';
     ModalComponent,
     SpinnerComponent,
     ButtonComponent,
+    InputComponent,
   ],
   templateUrl: './books-create-modal.component.html',
   styleUrl: './books-create-modal.component.css',
@@ -26,7 +28,7 @@ export class BooksCreateModalComponent {
 
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<void>();
-  @Output() selectedImageFile = new EventEmitter<void>();
+  @Output() select = new EventEmitter<Event>();
 
   onClose() {
     this.close.emit();
@@ -36,7 +38,7 @@ export class BooksCreateModalComponent {
     this.save.emit();
   }
 
-  onSelect() {
-    this.selectedImageFile.emit();
+  onSelect(event: Event) {
+    this.select.emit(event);
   }
 }

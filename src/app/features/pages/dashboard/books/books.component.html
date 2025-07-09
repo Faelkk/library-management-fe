@@ -17,6 +17,7 @@
 <app-books-create-modal
   [show]="showAddModal()"
   (close)="closeModal()"
+  (save)="saveBook()"
   [form]="bookService.createBookForm"
   [isLoading]="isCreating()"
   [genres]="genres()"
@@ -26,6 +27,7 @@
 
 <app-books-edit-modal
   [show]="showEditModal()"
+  (update)="updateBook()"
   (close)="closeModal()"
   [form]="bookService.editBookForm"
   (update)="updateBook()"
@@ -36,7 +38,7 @@
 />
 
 <app-book-see-modal
-  [show]="showEditModal()"
+  [show]="showSeeMoreModal()"
   (close)="closeModal()"
   [bookSelected]="bookService.selectedBook!"
 />

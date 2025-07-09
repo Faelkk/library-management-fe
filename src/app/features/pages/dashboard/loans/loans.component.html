@@ -24,18 +24,18 @@
 </app-dashboard-layout>
 
 <app-loan-create-modal
-  [show]="showEditModal()"
+  [show]="showAddModal()"
   (close)="closeModal()"
   [form]="loanService.createLoanForm"
-  (update)="updateLoan()"
+  (save)="saveLoan()"
   [isLoading]="isCreating()"
   [books]="books()"
   [clients]="clients()"
   [isLoading]="isCreating()"
   [isLoadingBooks]="isLoadingBooks()"
   [isLoadingClients]="isLoadingClients()"
-  (loanDateInput)="onEditLoanDateInput($event)"
-  (returnDateInput)="onEditReturnDateInput($event)"
+  (loanDateInput)="onCreateLoanDateInput($event)"
+  (returnDateInput)="onCreateReturnDateInput($event)"
 />
 
 <app-loan-edit-modal
