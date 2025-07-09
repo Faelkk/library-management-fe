@@ -1,0 +1,61 @@
+@if (bookSelected) {
+<app-modal [show]="show" (close)="onClose()" title="Ver informações do livro">
+  <section class="flex flex-col md:flex-row gap-10 md:min-w-[45rem]">
+    <figure>
+      <img
+        [src]="'http://localhost:5010' + bookSelected.imageUrl"
+        alt="Capa do livro"
+        class="max-h-[15rem] w-full object-contain md:max-h-[30rem] max-w-[30rem]"
+      />
+    </figure>
+    <div class="flex-1">
+      <header class="flex flex-col">
+        <h1 class="font-poppins text-gray-900 font-medium text-2xl">
+          {{ bookSelected.title }}
+        </h1>
+      </header>
+
+      <div class="flex flex-col gap-3 mt-5">
+        <p
+          class="font-sans text-gray-700 md:max-w-[15rem] overflow-hidden break-words line-clamp-4"
+        >
+          <strong class="mr-1">Descrição:</strong>{{ bookSelected.description }}
+        </p>
+
+        <span class="text-gray-700 font-sans flex items-center gap-1">
+          <strong>Autor:</strong> {{ bookSelected.author }}
+        </span>
+
+        <span class="text-gray-700 font-sans flex items-center gap-1">
+          <strong>Ano:</strong> {{ bookSelected.publishYear }}
+        </span>
+
+        <span class="text-gray-700 font-sans flex items-center gap-1">
+          <strong>ID:</strong>
+          <span
+            class="inline-block max-w-[4rem] overflow-hidden text-ellipsis whitespace-nowrap align-middle"
+          >
+            {{ bookSelected.id }}
+          </span>
+        </span>
+        <span class="text-gray-700 font-sans flex items-center gap-1">
+          <strong>Lançamento:</strong>
+          <span
+            class="inline-block max-w-[4rem] overflow-hidden text-ellipsis whitespace-nowrap align-middle"
+          >
+            {{ bookSelected.publishYear }}
+          </span>
+        </span>
+        <span class="text-gray-700 font-sans flex items-center gap-1">
+          <strong>Quantidade:</strong>
+          <span
+            class="inline-block max-w-[4rem] overflow-hidden text-ellipsis whitespace-nowrap align-middle"
+          >
+            {{ bookSelected.quantity }}
+          </span>
+        </span>
+      </div>
+    </div>
+  </section>
+</app-modal>
+}

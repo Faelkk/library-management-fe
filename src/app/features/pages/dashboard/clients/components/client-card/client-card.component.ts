@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { EventEmitter, Input, Output } from '@angular/core';
-import { formatPhoneNumber } from '../../../../../../../shared/utils/phone-number-format';
+import { formatPhoneNumber } from '../../../../../../shared/utils/phone-number-format';
 
 @Component({
   selector: 'app-client-card',
