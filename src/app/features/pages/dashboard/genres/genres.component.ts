@@ -13,6 +13,12 @@ import { GenresCardComponent } from './components/genres-card/genres-card.compon
 import { DashboardServiceService } from '../services/dashboard-service.service';
 import { ToastrService } from 'ngx-toastr';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
+import { GenresService } from './genres.service';
+import { GenreHeaderComponent } from './components/genre-header/genre-header.component';
+import { GenreListComponent } from './components/genre-list/genre-list.component';
+import { GenreCreateModalComponent } from './components/genre-create-modal/genre-create-modal.component';
+import { GenreEditModalComponent } from './components/genre-edit-modal/genre-edit-modal.component';
+import { GenreDeleteModalComponent } from './components/genre-delete-modal/genre-delete-modal.component';
 
 interface Genre {
   id: number;
@@ -31,71 +37,53 @@ interface Genre {
     ReactiveFormsModule,
     GenresCardComponent,
     SpinnerComponent,
+    GenreHeaderComponent,
+    GenreListComponent,
+    GenreCreateModalComponent,
+    GenreEditModalComponent,
+    GenreDeleteModalComponent,
   ],
   templateUrl: './genres.component.html',
   styleUrl: './genres.component.css',
 })
 export class GenresComponent {
-  constructor(
-    private dashboardService: DashboardServiceService,
-    private toastService: ToastrService
-  ) {
-    this.loadGenres();
+  constructor(public genreService: GenresService) {
+    this.genreService.loadGenres();
   }
-  genres = signal<Genre[]>([]);
+
+  get genres() {
+    return this.genreService.genres;
+  }
+
+  get filteredGenres() {
+    return this.genreService.filteredGenres;
+  }
+
+  get isLoadingGenres() {
+    return this.genreService.isLoadingGenres;
+  }
 
   showAddModal = signal(false);
   showEditModal = signal(false);
   showDeleteModal = signal(false);
-  isLoadingGenres = signal<boolean>(false);
-  isCreating: boolean = false;
-  isEditing: boolean = false;
-  isDeleting: boolean = false;
+  isCreating = signal(false);
+  isEditing = signal(false);
+  isDeleting = signal(false);
 
   selectedGenre: Genre | null = null;
 
-  search = signal<string>('');
-
-  createGenreForm = new FormGroup({
-    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
-    description: new FormControl('', [
-      Validators.required,
-      Validators.minLength(5),
-    ]),
-  });
-
-  editGenreForm = new FormGroup({
-    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
-    description: new FormControl('', [
-      Validators.required,
-      Validators.minLength(5),
-    ]),
-  });
-
-  filteredGenres = computed(() => {
-    const term = this.search().toLowerCase().trim();
-    if (!term) return this.genres();
-
-    return this.genres().filter(
-      (genre) =>
-        genre.id.toString().includes(term) ||
-        genre.name.toLowerCase().includes(term) ||
-        genre.description.toLowerCase().includes(term)
-    );
-  });
-
   updateSearch(value: string) {
-    this.search.set(value);
+    this.genreService.updateSearch(value);
   }
 
   openModal() {
     this.showAddModal.set(true);
-    this.editGenreForm.reset();
+    this.genreService.editGenreForm.reset();
   }
 
   openEditModal(genre: Genre) {
     this.selectedGenre = genre;
-    this.editGenreForm.patchValue(genre);
+    this.genreService.editGenreForm.patchValue(genre);
     this.showEditModal.set(true);
   }
 
@@ -112,130 +100,49 @@ export class GenresComponent {
   }
 
   saveGenre() {
-    if (this.createGenreForm.invalid) return;
+    this.isCreating.set(true);
 
-    const token = localStorage.getItem('auth-token');
-    if (!token) return;
-
-    this.isCreating = true;
-
-    const payload = {
-      name: this.createGenreForm.value.name!,
-      description: this.createGenreForm.value.description!,
-    };
-
-    this.dashboardService.createGenre(payload, token).subscribe({
-      next: (newGenre: Genre) => {
-        this.toastService.success('Gênero criado com sucesso');
-
-        this.genres.update((genres) => [...genres, newGenre]);
-
+    this.genreService.createGenre(
+      () => {
         this.closeModal();
+        this.isCreating.set(false);
       },
-      error: () => {
-        this.toastService.error('Erro ao criar gênero');
-        this.isCreating = false;
-        this.closeModal();
-      },
-      complete: () => {
-        this.isCreating = false;
-      },
-    });
+      () => {
+        this.isCreating.set(false);
+      }
+    );
   }
 
   updateGenre() {
-    if (this.editGenreForm.invalid || !this.selectedGenre) return;
+    if (!this.selectedGenre) return;
 
-    const token = localStorage.getItem('auth-token');
-    if (!token) return;
+    this.isEditing.set(true);
 
-    this.isEditing = true;
-
-    const payload = {
-      name: this.editGenreForm.value.name!,
-      description: this.editGenreForm.value.description!,
-    };
-
-    const hasChanged =
-      payload.name !== this.selectedGenre.name ||
-      payload.description !== this.selectedGenre.description;
-
-    if (!hasChanged) {
-      this.closeModal();
-      return;
-    }
-
-    this.dashboardService
-      .editGenre(this.selectedGenre.id, payload, token)
-      .subscribe({
-        next: (updatedGenre: Genre) => {
-          this.toastService.success('Gênero editado com sucesso');
-          this.genres.update((genres) =>
-            genres.map((g) => (g.id === updatedGenre.id ? updatedGenre : g))
-          );
-          this.closeModal();
-        },
-        error: () => {
-          this.toastService.error('Erro ao editar gênero');
-          this.isEditing = false;
-          this.closeModal();
-        },
-        complete: () => {
-          this.isEditing = false;
-        },
-      });
+    this.genreService.updateGenre(
+      this.selectedGenre,
+      () => {
+        this.closeModal();
+        this.isEditing.set(false);
+      },
+      () => {
+        this.isEditing.set(false);
+      }
+    );
   }
 
   confirmDelete() {
     if (!this.selectedGenre) return;
 
-    const token = localStorage.getItem('auth-token');
-    if (!token) return;
-
-    this.isDeleting = true;
-
-    this.dashboardService.deleteGenre(this.selectedGenre.id, token).subscribe({
-      next: () => {
-        this.toastService.success('Gênero deletado com sucesso');
-
-        this.genres.update((genres) =>
-          genres.filter((g) => g.id !== this.selectedGenre!.id)
-        );
-
+    this.isDeleting.set(true);
+    this.genreService.deleteGenre(
+      this.selectedGenre.id,
+      () => {
         this.closeModal();
+        this.isDeleting.set(false);
       },
-      error: () => {
-        this.toastService.error('Erro ao deletar gênero');
-        this.isDeleting = false;
-        this.closeModal();
-      },
-      complete: () => {
-        this.isDeleting = false;
-      },
-    });
-  }
-
-  loadGenres() {
-    const token = localStorage.getItem('auth-token');
-
-    if (!token) return;
-
-    this.isLoadingGenres.set(true);
-
-    this.dashboardService.getAllGenres(token).subscribe({
-      next: (res: any) => {
-        const genresFromApi = res as Genre[];
-        this.genres.set(genresFromApi);
-
-        this.isLoadingGenres.set(false);
-      },
-      error: (err) => {
-        this.toastService.error('Erro ao buscar generos');
-        console.error('Erro ao buscar generos', err);
-      },
-      complete: () => {
-        this.isLoadingGenres.set(false);
-      },
-    });
+      () => {
+        this.isDeleting.set(false);
+      }
+    );
   }
 }

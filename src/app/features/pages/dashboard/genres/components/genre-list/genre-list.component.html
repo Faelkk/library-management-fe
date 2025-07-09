@@ -1,0 +1,39 @@
+<section class="flex flex-col w-full flex-1">
+  <header
+    class="flex flex-col gap-2 md:flex-row justify-between w-full md:items-center mt-10"
+  >
+    <h2 class="font-poppins text-gray-800 font-medium">Lista de gêneros</h2>
+
+    <app-input
+      placeholder="Pesquise um gênero"
+      class="w-full md:max-w-[18.75rem] lg:max-w-[27.5rem]"
+      (valueChange)="onSearchChange($event)"
+    >
+      <img src="assets/icons/search.svg" alt="Search" class="w-5 h-5" />
+    </app-input>
+  </header>
+  <div class="mt-10 flex flex-wrap gap-5 max-h-[32rem] overflow-auto">
+    @if (isLoading) {
+    <div class="w-full flex justify-center items-center py-10">
+      <app-spinner />
+    </div>
+    } @else if (genres.length === 0 ) {
+    <p class="text-gray-500 text-center w-full">Nenhum gênero encontrado.</p>
+    } @else { @for (genre of genres; track genre.id) {
+    <app-genres-card
+      [description]="genre.description"
+      [name]="genre.name"
+      [id]="genre.id"
+      class="w-full lg:w-auto"
+      (edit)="onEdit(genre)"
+      (delete)="onDelete(genre)"
+    ></app-genres-card>
+    } }
+  </div>
+
+  <div class="w-full flex justify-end mt-5">
+    <app-button (click)="onAddGenre()" className="bg-teal-900">
+      <img src="assets/icons/add.svg" />
+    </app-button>
+  </div>
+</section>

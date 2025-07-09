@@ -1,0 +1,27 @@
+<app-modal [show]="show" (close)="onClose()" title="Editar gênero">
+  <form [formGroup]="form" (submit)="onSubmit()" class="md:min-w-[30rem]">
+    <div class="flex flex-col gap-3">
+      <app-input
+        label="Nome do Gênero"
+        placeholder="Ex: Romance"
+        formControlName="name"
+      ></app-input>
+
+      <app-input
+        label="Descrição do Gênero"
+        placeholder="Ex: Histórias envolventes repletas de exploração, desafios e descobertas, onde os personagens embarcam em jornadas emocionantes em busca de novos mundos, tesouros ou grandes feitos."
+        formControlName="name"
+      ></app-input>
+    </div>
+    <div class="flex justify-end gap-2 mt-4 w-full">
+      <app-button
+        class="bg-teal-900 text-white rounded-2xl w-full"
+        [disabled]="form.invalid || isLoading"
+        [isLoading]="isLoading"
+        type="submit"
+      >
+        Atualizar
+      </app-button>
+    </div>
+  </form>
+</app-modal>
