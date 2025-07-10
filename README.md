@@ -47,6 +47,30 @@ O front-end é baseado na arquitetura de componentes , utilizando standalone com
 
 ---
 
+## 📸 Prévia da Interface
+
+Abaixo algumas prévias principais da aplicação:
+
+### Tela de Gênero
+
+![Tela de Gênero](/public/docs/genres.png)
+
+### Tela de Empréstimos
+
+![Tela de Empréstimos](/public/docs/loans.png)
+
+### Tela de Livros
+
+![Tela de Livros](/public/docs/books.png)
+
+### Tela de Usuários
+
+![Tela de Usuários](/public/docs/user.png)
+
+### Tela de Clientes
+
+![Tela de Clientes](/public/docs/clients.png)
+
 ## 🚀 Como Rodar o Projeto
 
 1.  **Clone o Repositório:**
